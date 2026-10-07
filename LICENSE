@@ -1,0 +1,72 @@
+UiGuide Agent License
+Copyright (c) 2026 DomitorAI. All rights reserved.
+
+The author of UiGuide Agent ("the Author", publishing as DomitorAI) owns the
+copyright in the Software. The Author shares the Software free of charge, as
+knowledge put into a working application. This license lets you use it; it
+does not transfer any ownership of the Software to you.
+
+Definitions
+- "Software": the UiGuide Agent binaries, packages, container images, scripts
+  and documentation published by the Author (including the GitHub releases and
+  the NuGet, npm and container packages).
+- "Your Application": software that you develop or operate, that uses the
+  Software and that has its own purpose and functionality beyond the Software.
+
+1. Free use without limits. You may use, install, run and copy the Software
+   for any purpose, including commercial purposes, free of charge, with no
+   limit on the number of users, applications, servers or devices.
+
+2. Use in your applications. You may include the Software's client libraries
+   (for example the desktop SDK and the web script) in Your Application and
+   distribute them, unmodified, together with Your Application - also when you
+   sell Your Application. Your end users may use them as part of Your
+   Application.
+
+3. Server. You may run the UiGuide Agent server on any infrastructure (your
+   computer, your organization's servers, a cloud provider) for your own
+   applications and for those of your clients.
+
+4. Resale only with the Author's permission. Without the Author's prior
+   written permission (an e-mail is enough) you may not:
+   a) sell, rent, license or otherwise charge for the Software itself or a
+      copy of it, alone or in a bundle whose main value is the Software;
+   b) offer the Software to others as a paid hosted service whose main value
+      is the Software itself.
+   You may always charge for Your Application, and for your own services of
+   installing, configuring or integrating the Software for a client.
+   Requests: see "Contact" below.
+
+5. Integrity. You may not distribute modified versions of the Software's
+   binaries or packages, nor present the Software, or a modified version of
+   it, as your own work. You may configure and extend the Software through its
+   documented settings, protocol and APIs. Decompiling the Software for
+   interoperability or troubleshooting is allowed.
+
+6. Notices. Keep this license and the copyright notices with any copy of the
+   Software you distribute. Third-party components included in the Software
+   are provided under their own licenses (see THIRD-PARTY-NOTICES where
+   provided); this license does not change those licenses.
+
+7. Your data. This license gives the Author no rights to Your Application,
+   your data or your end users' data. The Software runs on infrastructure you
+   control and sends data only to the services you configure (for example your
+   UiGuide Agent server and your LLM provider).
+
+8. Your decision, no warranty. Nobody is required to use the Software. The
+   decision to use it, and how, in any project is yours alone, and so is the
+   responsibility for that decision. The Software is provided free of charge,
+   "AS IS", without warranty of any kind, express or implied, including
+   fitness for a particular purpose. It may contain errors. The Author has no
+   obligation to provide support, fixes or updates. You use the Software at
+   your own risk, to the extent permitted by applicable law.
+
+9. No liability. To the extent permitted by applicable law, the Author shall
+   not be liable for any damages (including loss of data, profit or business)
+   arising from the use of, or the inability to use, the Software. This does
+   not limit liability that cannot be limited by law (for example for intent
+   or gross negligence).
+
+Contact: https://github.com/DomitorAI/ui-guide-agent (open an issue, or use
+the contact given there) - for permissions, questions, and for the development
+of a version tailored to a specific project.

@@ -1,0 +1,37 @@
+name: Bug report
+description: Report a problem with the server, a client SDK, the uiguide tool or the install script.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what actually happened.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start uiguide-server...
+        2. Ask in the chat widget...
+        3. ...
+    validations:
+      required: false
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      placeholder: UiGuide Agent version, component (server / desktop SDK / web SDK / uiguide), OS, UI technology (WPF, WinForms, web framework), LLM endpoint type (LiteLLM, vLLM, Ollama, OpenAI)
+    validations:
+      required: false
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant output
+      description: Server log lines or `uiguide doctor` output. Remove API keys and any personal data first.
+      render: shell
+    validations:
+      required: false
