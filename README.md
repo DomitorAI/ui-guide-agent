@@ -1,5 +1,8 @@
 # UiGuide Agent
 
+> **🚧 Under active development — not ready for use yet.**
+> UiGuide Agent is in early development: the setup is being reworked, the packages are not on NuGet.org / npm yet and parts of what is described here may not work. Please wait for the first stable release before adding it to your project — **Watch → Custom → Releases** to be notified. Ideas and questions are welcome in [Discussions](https://github.com/DomitorAI/ui-guide-agent/discussions).
+
 ## YOUR USERS ASK. YOUR APP ANSWERS. NO DOCUMENTATION TO WRITE.
 
 **An AI help agent you add to any application with a user interface.** Your users ask *"how do I…?"* inside your app and get concrete steps — which button to press, what happens next — in their language, starting from the screen they are on.
