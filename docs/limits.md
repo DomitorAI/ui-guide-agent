@@ -14,7 +14,7 @@ What UiGuide Agent does not do yet. What it supports: [Works with](../README.md#
 
 - Internet Explorer and outdated browsers are not supported.
 - Pages inside iframes and closed shadow roots are not read by the assistant.
-- A web address not allowed for your application is refused. `uiguide init` allows your development addresses; your production address you add once ([Web, step 1](web.md)).
+- A web address not allowed for your application is refused. `uiguide init` allows your development addresses; your production address you add once ([What the build does](web.md#what-the-build-does)).
 
 ## Any other Windows application (Companion)
 
@@ -30,11 +30,11 @@ What UiGuide Agent does not do yet. What it supports: [Works with](../README.md#
 - Screens opened through a choice made at run time or a route built from variables are not read — they are learned only after 3 different users or computers used them.
 - The knowledge bundle can be at most 2 MB.
 - A bundle not used for 180 days is deleted from the server, with its cached answers.
-- The build machine needs the .NET 8+ runtime, also for .NET Framework 4.8 projects.
+- With the .NET packages the build machine needs the .NET 8+ runtime, also for .NET Framework 4.8 projects (npm projects don't: the tool comes self-contained, for Windows, Linux and macOS on x64 and arm64).
 
 ## Answers
 
-- The panel's own texts (buttons, messages) are built in only for English, Romanian and Russian; for other languages set your own with `texts` ([Look and texts](desktop.md#look-and-texts)), otherwise they are in English. The answers themselves are in the language of the question.
+- The panel's own texts (buttons, messages) are built in only in English. A build with a server translates them into the languages of your resource files, at most 20; an application in one language without resource files needs `"language"` in `uiguide.json` ([Look and texts](desktop.md#look-and-texts)). Languages chosen only at run time stay in English unless you add them to `texts`. The answers themselves are in the language of the question.
 - No links or formatting in answers — plain text only.
 - Questions: at most 2,000 characters. The panel keeps only the last 100 messages.
 - At most 400 controls of a screen are seen; controls without an accessible name and without an id are left out.
@@ -44,8 +44,7 @@ What UiGuide Agent does not do yet. What it supports: [Works with](../README.md#
 
 - Without authentication (the default) it does not answer from the network — only on its own computer ([Your company's server](company-server.md)).
 - Conversations are kept only in memory, 30 minutes after the last question; a restart forgets them and resets the usage limits.
-- The install line is for Windows 10/11 x64 only; on Linux use the Docker image.
-- The Docker image is not in a container registry yet — it is a file in the release.
+- As a .NET tool the server needs the .NET SDK 10 or newer; without it, use the Docker image.
 
 ## Developer tools
 

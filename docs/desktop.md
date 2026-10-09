@@ -2,35 +2,45 @@
 
 # Getting started — desktop (WPF / WinForms)
 
-Seven steps. Each one says what to do, what you should see, and what to do if you don't. You need Windows 10/11 and the [.NET SDK](https://dotnet.microsoft.com/download) 8 or newer (as for any .NET development).
+Five steps. Each one says what to do, what you should see, and what to do if you don't. You need the [.NET SDK](https://dotnet.microsoft.com/download) 8 or newer (as for any .NET development).
 
-## Step 1 — Install everything (one line)
+## Step 1 — Add the package
 
-```powershell
-irm https://raw.githubusercontent.com/DomitorAI/ui-guide-agent/main/scripts/install.ps1 | iex
-```
-
-No admin rights, nothing to download by hand. It installs, in `%LOCALAPPDATA%\ui-guide-agent`:
-- the **local server** (`uiguide-server`, added to your `PATH`);
-- the **packages** of the latest release, registered as the NuGet source `ui-guide-agent` (they are not on NuGet.org yet);
-- the developer tools **`uiguide`** and **`uiguide-companion`** (.NET tools).
-
-It does not change your projects: the library goes into a project in step 4. Running it again updates everything and keeps your settings. To remove everything: [Uninstall](../README.md#uninstall).
-
-**Your company already runs the server** (you don't want one on your computer) — only the packages and the tools:
+In your application's project folder (next to the `.csproj`):
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/DomitorAI/ui-guide-agent/main/scripts/install.ps1))) -NoServer
+dotnet add package UiGuideAgent.Desktop
 ```
 
-then skip step 2 and in step 4 run `uiguide init --server https://<your company's server>` — see [Your company's server](company-server.md). (`-ServerOnly` instead of `-NoServer`: a machine that only runs the server.)
+Build and run. **That's all the code you need:** the package adds a small start-up hook to your application, and the assistant appears on your **main window** (WPF: `Application.MainWindow`, also a later one such as the window shown after a login; WinForms: the first form). It works for WPF and WinForms, on .NET 8+ (`net8.0-windows` or newer) and .NET Framework 4.8.
 
-**You should see:** `UiGuide Agent installed. Next: …`.
-**If not:** a running server blocks the update — stop it (Ctrl+C in its window) and run the line again; *the .NET SDK is not installed* — install it, then run the line again.
+**You should see:** a round button in the bottom-right corner of the main window; asked something, the assistant answers *"The assistant is not configured yet."* — and the build warns `UIG003`: it has no server yet (step 2). Your application works as before either way.
 
-## Step 2 — Connect your LLM
+The first build has written **`uiguide.json`** next to your project (the application id from the project's name; copied next to your executable at every build — yours from now on, see [Configuration](configuration.md)) and **`uiguide.map.json`** (step 4); every build also reads your windows for the assistant and warns `UIG001` about controls without a name.
 
-Edit `%LOCALAPPDATA%\ui-guide-agent\server\appsettings.json`:
+**If the button does not appear:**
+
+| Cause | Fix |
+|---|---|
+| .NET Framework 4.8 project with the default C# version (7.3) — the build output says *"UiGuide Agent: automatic start needs C# 9"* | add `<LangVersion>latest</LangVersion>` to the project, **or** start it from code: `UiGuide.Attach(this);` in your main window's constructor (WPF `Window` or WinForms `Form`), after `InitializeComponent();` |
+| the configuration is invalid | the reason is written to the debug output (Visual Studio → Output → Debug), prefixed `UiGuide:` — e.g. an invalid `appId` |
+| `"autoStart": false` or `<UiGuideAutoStart>false</UiGuideAutoStart>` | call `UiGuide.Attach(window)` yourself |
+| none of the above | start the application with the environment variable `UIGUIDE_LOG` set to a file (PowerShell: `$env:UIGUIDE_LOG = "$env:TEMP\uiguide.log"; .\YourApp.exe`) — the SDK writes there each step: configuration read, which window it waits for, the button shown or the error |
+
+A login window shown **before** the main window gets the button too (the user can ask how to sign in); it moves to the main window once that appears.
+
+## Step 2 — Connect a server
+
+The assistant's brain is the UiGuide Agent server, which talks to your LLM; your application only needs its address. Once, then rebuild — no code.
+
+**On your computer** (to try it) — the server is a .NET tool (it needs the .NET SDK 10 or newer):
+
+```powershell
+dotnet tool install -g UiGuideAgent.Server.Host
+uiguide-server
+```
+
+Its first start creates your settings, `%LOCALAPPDATA%\ui-guide-agent\server.json` — the path is in its first log lines; `dotnet tool update -g UiGuideAgent.Server.Host` keeps them. Stop it (Ctrl+C) and set your LLM there:
 
 ```jsonc
 "Llm": {
@@ -47,85 +57,38 @@ $env:Llm__ApiKey = "<your key>"
 uiguide-server
 ```
 
-**You should see:** `http://localhost:5180/api/v1/health` returns `"llm": "ok"`.
-**If not:** `not_configured` = `BaseUrl` or `Model` missing; `unavailable` = the endpoint does not answer (address, key, network).
+**You should see:** `http://localhost:5180/api/v1/health` returns `"llm": "ok"` (`not_configured` = `BaseUrl` or `Model` missing; `unavailable` = the endpoint does not answer: address, key, network). **Rebuild your application:** the build finds the server, writes `"server": "http://localhost:5180"` into `uiguide.json` and registers your application on it (`%LOCALAPPDATA%\ui-guide-agent\data\apps\<appId>.json` — see [The application profile](#the-application-profile)).
 
-## Step 3 — Check the `uiguide` tool
-
-In a **new** terminal: `uiguide --version` prints the version (installed in step 1).
-**If `uiguide` is not found:** open a new terminal (the .NET tools folder is added to `PATH` at the first tool install); otherwise add `%USERPROFILE%\.dotnet\tools` to your `PATH`.
-
-## Step 4 — Connect your project
-
-In your application's **project folder** (next to the `.csproj`):
+**Your company's server** — in the project folder:
 
 ```powershell
-uiguide init
-dotnet add package UiGuideAgent.Desktop
+dotnet tool install -g UiGuideAgent.Cli      # once: the uiguide tool
+uiguide init --server https://<your company's server>
 ```
 
-`uiguide init` asks a few questions (server, application id, language, one sentence about your application — each with a default, press Enter to accept) and then:
-- writes **`uiguide.json`** next to the project — the package copies it next to your executable at every build;
-- checks that the server answers (it is fine if it is not running yet);
-- **registers your application** on the local server (`%LOCALAPPDATA%\ui-guide-agent\data\apps\<appId>.json`, with the name of your project — edit that file to add a description, your support contact and your own rules, see [The application profile](#the-application-profile)).
+It writes the address and the application's key into `uiguide.json` (your other settings stay) and prints the one line for the server's administrator — see [Your company's server](company-server.md). Rebuild.
 
-`uiguide init --yes` asks nothing and uses the defaults; `uiguide help init` lists the options (`--server`, `--app-id`, `--language`, …).
+## Step 3 — Ask
 
-The package works for WPF and WinForms, on .NET 8+ (`net8.0-windows` or newer) and .NET Framework 4.8.
+Run your application, click the button and ask *"How do I …?"*: the answer names the buttons exactly as they appear in your UI.
 
-**If `dotnet add package` cannot find the package:** your solution has its own `nuget.config` with `<clear />` — add the folder there too: `<add key="ui-guide-agent" value="%LOCALAPPDATA%\ui-guide-agent\packages" />`.
+**Something is wrong? Run `uiguide doctor` in the project folder first** (the tool: step 2). It checks everything in order — the package, `uiguide.json`, the server and its protocol, your LLM, the registration, the knowledge bundle, the accessible names, the WebView2 Runtime — and says what to do for each problem (exit code 1 when something must be fixed).
 
-<details>
-<summary>Without the tool: the two files by hand</summary>
-
-`uiguide.json` in the project folder:
-
-```jsonc
-{
-  "server": "http://localhost:5180",   // the UiGuide Agent server (step 1)
-  "appId": "order-desk",               // lowercase letters, digits and '-'
-  "language": "en-US"                  // optional: default = your application's UI culture
-  // "autoStart": false                // optional: start the assistant only from code (step 7)
-  // "observeNavigation": false        // optional: never report which window a control opened (see how-it-works.md)
-  // "position", "theme", "texts"      // optional: see "Look and texts" (step 7)
-}
-```
-
-and `%LOCALAPPDATA%\ui-guide-agent\data\apps\order-desk.json` (same `appId`) with at least `{ "profile": { "name": "Order Desk" } }`.
-</details>
-
-## Step 5 — Build and run
-
-Build and start your application. **That's all the code you need:** the package adds a small start-up hook to your application, and the assistant appears on your **main window** (WPF: `Application.MainWindow`, also a later one such as the window shown after a login; WinForms: the first form).
-
-**You should see:** a round button in the bottom-right corner of the main window. Click it, ask *"How do I …?"*, and the answer names the buttons exactly as they appear in your UI.
-
-**Something is wrong? Run `uiguide doctor` in the project folder first.** It checks everything in the order of these steps — the package, `uiguide.json`, the server and its protocol, your LLM, the registration, the knowledge bundle, the accessible names, the WebView2 Runtime — and says what to do for each problem (exit code 1 when something must be fixed).
-
-**If the button does not appear:**
-
-| Cause | Fix |
-|---|---|
-| .NET Framework 4.8 project with the default C# version (7.3) — the build output says *"UiGuide Agent: automatic start needs C# 9"* | add `<LangVersion>latest</LangVersion>` to the project, **or** start it from code: `UiGuide.Attach(this);` in your main window's constructor (WPF `Window` or WinForms `Form`) |
-| `uiguide.json` is not next to the executable | it must be in the project folder (same folder as the `.csproj`) |
-| the configuration is invalid | the reason is written to the debug output (Visual Studio → Output → Debug), prefixed `UiGuide:` — e.g. an invalid `appId` or `server` |
-| `"autoStart": false` or `<UiGuideAutoStart>false</UiGuideAutoStart>` | call `UiGuide.Attach(window)` yourself |
-| none of the above | start the application with the environment variable `UIGUIDE_LOG` set to a file (PowerShell: `$env:UIGUIDE_LOG = "$env:TEMP\uiguide.log"; .\YourApp.exe`) — the SDK writes there each step: configuration read, which window it waits for, the button shown or the error |
-
-A login window shown **before** the main window gets the button too (the user can ask how to sign in); it moves to the main window once that appears.
-
-**If the button appears but answers fail** (the panel's messages):
+**If answers fail** (the panel's messages):
 
 | Message | Fix |
 |---|---|
-| *Cannot reach the assistant. Check the connection.* | is `uiguide-server` running? is `server` in `uiguide.json` correct? |
+| *The assistant is not configured yet.* | no server address yet — step 2, then rebuild |
+| *Cannot reach the assistant. Check the connection.* | is the server running? is `server` in `uiguide.json` correct? |
 | *You are not signed in to the assistant.* | a server on another computer needs authentication — see [Your company's server](company-server.md) (the administrator runs the line printed by `uiguide init`) |
 | *The assistant is not available right now.* | the server cannot use your LLM — check `/api/v1/health` (step 2) |
 | *The assistant is busy. Please try again in N s.* | your LLM is at its limit; the user retries after the time shown |
 | *The assistant is taking too long.* | the LLM did not answer in time (`Llm:TimeoutSeconds`, default 180) |
-| *Something went wrong. Please try again.* | most often: the `appId` is not registered on the server (step 4), or its file is not valid JSON — the server log says which |
+| *Something went wrong. Please try again.* | most often: the `appId` is not registered on the server, or its file is not valid JSON — the server log says which |
 
-## Step 6 — Teach the assistant your application (recommended)
+**From your computer to your users.** The Release build (and its installer) never carries an address of this computer: `localhost` is left out of the `uiguide.json` next to the executable, while your project keeps it. Until your users have an address (your company's server, step 2), every build warns `UIG003`; `<UiGuideServerRequired>true</UiGuideServerRequired>` makes it an error in the Release build. In the panel your users then see the assistant in their language — see [Look and texts](#look-and-texts).
+
+## Step 4 — Teach the assistant your application (recommended)
 
 Without this step the assistant knows only what is on the user's screen at the moment of the question. With it, it knows all your windows, menus and their exact texts in every language, and what you tell it about them.
 
@@ -148,13 +111,7 @@ uiguide scan --fix    # only copies the tooltip / hint / inner text YOU already 
 
 `<UiGuideNamesAsErrors>true</UiGuideNamesAsErrors>` in the `.csproj` makes the warnings build errors; `<UiGuideCheckNames>false</UiGuideCheckNames>` turns the check off.
 
-**2. Generate the knowledge bundle — once:**
-
-```powershell
-uiguide bundle
-```
-
-It reads your windows, their controls (with menus and shortcuts), **which control opens which window** and your UI texts in every language (resource dictionaries and `.resx` files; the language comes from the file or folder name, e.g. `lang.de-DE.xaml`, `Strings.de.resx`), and writes `uiguide.bundle.json`. It also creates **`uiguide.map.json`** — the part you write. **From then on, every build regenerates the bundle** (only when something changed) and copies it next to your executable; the server receives it the first time a user asks a question with a new version.
+**2. The knowledge bundle — made by every build.** The build reads your windows, their controls (with menus and shortcuts), **which control opens which window** and your UI texts in every language (resource dictionaries and `.resx` files; the language comes from the file or folder name, e.g. `lang.de-DE.xaml`, `Strings.de.resx`), and writes `uiguide.bundle.json` (only when something changed), copied next to your executable; the server receives it the first time a user asks a question with a new version. The first build also creates **`uiguide.map.json`** — the part you write. `uiguide bundle` does the same from the console.
 
 **3. Describe what the code cannot say** in `uiguide.map.json` (comments allowed). Refer to controls by their id (`x:Name` / `Name`); you only add meaning — the names and texts come from the code:
 
@@ -181,7 +138,7 @@ It reads your windows, their controls (with menus and shortcuts), **which contro
 
 - `action` — what the user achieves with the control; `enabledWhen` / `visibleWhen` — when it can be used; `opens` — the screen it opens (read from the code for event handlers, MVVM commands and links — `uiguide bundle` prints `Navigation: N controls open another screen (M read from the code …)` — and learned while your application is used, see [Learned navigation](how-it-works.md#learned-navigation); write it only to correct one); `label` — a description of a control without text (an icon).
 - `flows` — the usual tasks: a `goal` in the user's words and the `steps`; `{id}` (or `{resourceKey}`) is replaced by the control's exact text in the user's UI language.
-- Your fields win over the generated ones for the same control; a control described here that no longer exists in the code is reported by `uiguide bundle` (and as a build warning).
+- Your fields win over the generated ones for the same control; a control described here that no longer exists in the code is reported as a build warning.
 
 **Record the flows instead of writing them:** `uiguide record --goal "export the orders"` starts your built application; do the task once, close the application, and the controls you used become the flow in `uiguide.map.json` (`--dry-run` only shows it). Only control ids, names and types are recorded — never what you type or which list item you pick. Run it again with the same goal to replace the flow.
 
@@ -220,7 +177,7 @@ The file `%LOCALAPPDATA%\ui-guide-agent\data\apps\<appId>.json` (created by `uig
 
 `supportContact` is what the assistant answers when it has no information; `rules` are your own rules, one per line.
 
-## Step 7 — Tell the assistant your application's state (optional)
+## Step 5 — Tell the assistant your application's state (optional)
 
 Anything the UI alone doesn't show — call it whenever the state changes:
 
@@ -271,4 +228,6 @@ In `uiguide.json` (or `UiGuideOptions.Theme` / `Position` / `Texts` in code):
 }
 ```
 
-Texts you can change: `launcher` (the round button's name), `title`, `greeting`, `placeholder`, `send`, `stop`, `clear`, `close`, `open`, `thinking` (`{s}` = seconds), `queued` (`{n}` = position), `stopped`, `errorBusy` (`{s}`), `errorTimeout`, `errorLlm`, `errorUnauthorized`, `errorNetwork`, `errorGeneric`. The most specific language wins (`de-DE` over `de` over every language); a wrong color, an unknown setting or text is reported like any other configuration error (debug output, `UiGuide:`).
+**The panel's texts in your users' languages.** The built-in texts are in English. When a build has a server, it asks it once to translate them into every language your UI has (the languages of your resource files, or `"language"` in `uiguide.json` for an application in one language) and writes the translations under `"texts"` — yours from then on, to check and change. Texts you already wrote are never replaced. When the server cannot translate them (warning `UIG004`), the panel stays in English for those languages and the next build asks again. `<UiGuidePanelTexts>false</UiGuidePanelTexts>` in the project turns this off.
+
+Texts you can change: `open` (the round button's name), `title` (also of the assistant's message boxes), `greeting`, `placeholder`, `send`, `stop`, `clear`, `close`, `thinking` (`{s}` = seconds), `queued` (`{n}` = position), `stopped`, `errorBusy` (`{s}`), `errorTimeout`, `errorLlm`, `errorUnauthorized`, `errorNetwork`, `errorGeneric`, `errorNotConfigured`, `errorWebView2Missing`, `errorPanelStart`. The most specific language wins (`de-DE` over `de` over every language); a wrong color, an unknown setting or text is reported like any other configuration error (debug output, `UiGuide:`).

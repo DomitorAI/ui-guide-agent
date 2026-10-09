@@ -1,5 +1,5 @@
 # UiGuide Agent server for a company network (Docker). Start: docker compose up -d
-# The image: from the GitHub release (docker load < ui-guide-agent-server-docker.tar.gz).
+# The image: ghcr.io/domitorai/ui-guide-agent-server (docker compose pulls it). Update: docker compose pull, then up -d.
 # Secrets come from the environment / an .env file next to this file (never committed):
 #   LLM_BASE_URL=https://llm.example.com/v1
 #   LLM_MODEL=qwen3

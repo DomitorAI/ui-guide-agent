@@ -1,7 +1,7 @@
 # UiGuide Agent
 
 > **🚧 Under active development — not ready for use yet.**
-> UiGuide Agent is in early development: the setup is being reworked, the packages are not on NuGet.org / npm yet and parts of what is described here may not work. Please wait for the first stable release before adding it to your project — **Watch → Custom → Releases** to be notified. Ideas and questions are welcome in [Discussions](https://github.com/DomitorAI/ui-guide-agent/discussions).
+> UiGuide Agent is in early development: parts of what is described here may change or not work yet. Please wait for the first stable release before adding it to your project — **Watch → Custom → Releases** to be notified. Ideas and questions are welcome in [Discussions](https://github.com/DomitorAI/ui-guide-agent/discussions).
 
 ## YOUR USERS ASK. YOUR APP ANSWERS. NO DOCUMENTATION TO WRITE.
 
@@ -12,7 +12,7 @@
 - **No help pages, no user manual, no tutorials to write.** The agent learns your application from your source code — windows, controls, texts, which button opens which screen — automatically, at every build.
 - **Never out of date.** Change the UI, rebuild — the answers follow the new version. Documentation written by hand is wrong the day after a release; this is not.
 - **Fewer support questions.** Users get the answer where they are stuck, not in a ticket.
-- **Minutes to add:** one NuGet package (WPF / WinForms) or one `<script>` line (web) — no code. Applications you cannot change are covered by the Companion.
+- **Minutes to add:** one NuGet package (WPF / WinForms, Blazor) or one npm package and one line in your bundler's configuration (React, Vue, Svelte…) — no code. Applications you cannot change are covered by the Companion.
 - **Your LLM, your server, your data:** only UI structure and labels leave the app, never what users type.
 
 > **User:** How do I export the invoices to CSV?<br>
@@ -24,13 +24,14 @@
 |---|---|---|---|
 | **WPF**, **WinForms** — .NET 8+ and .NET Framework 4.8 | NuGet `UiGuideAgent.Desktop`, no code | windows, controls, texts (`.resx`, resource dictionaries), event handlers, MVVM commands (CommunityToolkit, Prism-style `DelegateCommand`, ReactiveUI, Caliburn.Micro), shortcuts | ✔ |
 | **Blazor**, **Razor Pages / MVC**, **.NET MAUI Blazor Hybrid** | NuGet `UiGuideAgent.Web` + one `<script>` line | pages and `@page` routes, links, `NavigateTo` | ✔ |
-| **Vue**, **React**, **Angular**, **Svelte / SvelteKit**, **Next.js**, **Nuxt**, plain **HTML** | one `<script>` line | pages, router configuration (child routes, lazy modules) or folder routes, links, router calls | ✔ |
+| **React**, **Vue**, **Svelte**, **Angular**, **Next.js**, **Nuxt** (Vite, webpack, Next) | npm `@ui-guide-agent/web` + one line in the bundler's configuration — no .NET needed | pages, router configuration (child routes, lazy modules) or folder routes, links, router calls | ✔ |
+| plain **HTML** (no bundler) | one `<script>` line | pages, links | ✔ |
 | **Python** — PyQt 5/6, PySide 2/6, Tkinter, customtkinter | the Companion, no change to the app | windows, controls, `clicked.connect` / `command=` | Qt ✔ · Tk ✗ |
 | **Java** (Swing / JavaFX with the Access Bridge), **Delphi**, **Electron**, any Windows **exe** — also without source | the Companion, no change to the app | — (the assistant reads the screen) | ✔ when the app exposes its controls |
 
 **Not supported:** desktop applications on macOS or Linux, native mobile apps (iOS / Android, .NET MAUI without Blazor). Desktop users need Windows 10/11; web pages run in any current browser; the server runs on Windows or Linux (Docker).
 
-> **Preview (0.5)** — things may still change. What is not supported yet: [Limits](docs/limits.md).
+> **Preview (0.6)** — things may still change. What is not supported yet: [Limits](docs/limits.md).
 
 ## How it works
 
@@ -66,78 +67,80 @@ A label that repeats a control's value is dropped too (some UI frameworks expose
 
 ## Requirements
 
-- Developer machine: Windows 10/11 and the [.NET SDK](https://dotnet.microsoft.com/download) 8+.
+- Developer machine: the [.NET SDK](https://dotnet.microsoft.com/download) 8+ for .NET applications; Node.js 20+ for the others (no .NET needed).
 - Your users: Windows 10/11 with the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) (preinstalled on Windows 11) for desktop applications; any current browser for web pages.
-- An OpenAI-compatible LLM endpoint.
-
-## Install
-
-One line in PowerShell, no admin rights:
-
-```powershell
-irm https://raw.githubusercontent.com/DomitorAI/ui-guide-agent/main/scripts/install.ps1 | iex
-```
-
-It installs the local server `uiguide-server`, the packages (as the NuGet source `ui-guide-agent` — they are not on NuGet.org / npm yet) and the tools `uiguide` and `uiguide-companion`, in `%LOCALAPPDATA%\ui-guide-agent`. It does not change your projects. Nothing to download by hand from the release page.
-
-Your company already runs the server? Without the local one: `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/DomitorAI/ui-guide-agent/main/scripts/install.ps1))) -NoServer` — then see [Your company's server](#your-companys-server).
+- The server: on your computer the [.NET SDK](https://dotnet.microsoft.com/download) 10+ (it is a .NET tool) or Docker; for your company Docker (Linux or Windows).
+- An OpenAI-compatible LLM endpoint — used only by the server.
 
 ## Quick start
 
-1. **Your LLM** — in `%LOCALAPPDATA%\ui-guide-agent\server\appsettings.json` set `Llm:BaseUrl` and `Llm:Model`; then, in PowerShell:
-   ```powershell
-   $env:Llm__ApiKey = "<your key>"    # leave unset for an endpoint without authentication
-   uiguide-server                      # check: http://localhost:5180/api/v1/health → "llm": "ok"
-   ```
-2. **Your project** — in its folder, in a new terminal:
+**1. Add the library — the first build does the rest.**
 
-   | Application | Commands |
-   |---|---|
-   | WPF / WinForms | `uiguide init`, `dotnet add package UiGuideAgent.Desktop` — build and run: the button is on your main window, no code needed |
-   | Blazor / Razor / .NET MAUI Blazor | `uiguide init`, `dotnet add package UiGuideAgent.Web`, and the `<script>` line `uiguide init` prints |
-   | any other web page | `uiguide init`, then the `<script>` line with `ui-guide-agent.js` from the release |
-   | Python, Java, any exe | `uiguide init`, `uiguide bundle`, then `uiguide-companion --config uiguide.json --run "python app.py"` |
+| Application | What you add |
+|---|---|
+| WPF / WinForms | `dotnet add package UiGuideAgent.Desktop` — no code |
+| Blazor / Razor / .NET MAUI Blazor | `dotnet add package UiGuideAgent.Web`, and one line in your page: `<script src="_content/UiGuideAgent.Web/ui-guide-agent.js"></script>` |
+| React, Vue, Svelte… (Vite) | `npm install -D @ui-guide-agent/web`, and in `vite.config`: `plugins: [uiGuide()]` (`import uiGuide from '@ui-guide-agent/web/vite'`) — webpack, Next.js: [Web](docs/web.md) |
+| Python, Java, any exe | the Companion — [Companion](docs/companion.md) |
 
-3. **Make it better** (recommended): name every control after what it does (each build warns `UIG001` about the ones left), describe what the code cannot say in `uiguide.map.json`, check the answers with `uiguide test`.
+Build and run. Your application works as before, with the assistant's round button; the assistant answers *"The assistant is not configured yet."* and the build warns `UIG003` — it has no server yet. The build has written `uiguide.json` next to your project (the application id from its name) and, at every build, reads your windows / pages for the assistant and warns `UIG001` about controls without a name.
+
+**2. Connect a server — once, then rebuild.** No code; nothing in your application changes.
+
+- **On your computer** (to try it):
+  ```powershell
+  dotnet tool install -g UiGuideAgent.Server.Host
+  uiguide-server
+  ```
+  The first start creates your settings, `%LOCALAPPDATA%\ui-guide-agent\server.json` (Linux / macOS: `~/.local/share/ui-guide-agent/server.json`; kept when the server is updated): set your LLM there (`"Llm"` → `"BaseUrl"`, `"Model"`; the key only as the environment variable `Llm__ApiKey`) and start `uiguide-server` again. The next build finds it, writes its address into `uiguide.json` and registers your application on it.
+- **Your company's server:** in the project folder `uiguide init --server https://…` (the tool: `dotnet tool install -g UiGuideAgent.Cli`, or `npx uiguide` in an npm project) — it writes the address and the application's key, and prints the one line for the server's administrator. See [Your company's server](docs/company-server.md).
+
+**3. Make it better** (recommended): name every control after what it does (`UIG001` lists the ones left), describe what the code cannot say in `uiguide.map.json`, check the answers with `uiguide test`.
 
 Something wrong? Run **`uiguide doctor`** in the project folder — it checks the whole setup and says what to do.
+
+## From your computer to your users
+
+- **The address of this computer never reaches your users.** The Release build (`dotnet publish`, `vite build`, `next build`…) leaves a `localhost` address out of the configuration that ships with your application; `uiguide.json` in your project keeps it, so you keep testing locally. Until your users have a server address, every build warns `UIG003`; `<UiGuideServerRequired>true</UiGuideServerRequired>` (npm: `uiGuide({ serverRequired: true })`) makes it an error in the build for your users.
+- **Your users' server** is your company's: `uiguide init --server https://…` once, then build and publish as usual.
+- **The panel in your application's languages.** The panel's own texts (title, buttons, messages) are built in for English. For the other languages of your application (its resource files, or `"language"` in `uiguide.json`) the build has your server's LLM translate them once and adds them to `"texts"` in `uiguide.json` — correct them there, they are never overwritten. Until then that language's panel is in English (warning `UIG004`). The answers always follow the language of the question.
 
 ## Documentation
 
 | Guide | What is in it |
 |---|---|
-| [Desktop (WPF / WinForms)](docs/desktop.md) | step by step: install, LLM, project, run, teaching the assistant your application, state, API, look and texts, troubleshooting |
-| [Web](docs/web.md) | Blazor, Razor, .NET MAUI Blazor Hybrid, any web page |
+| [Desktop (WPF / WinForms)](docs/desktop.md) | step by step: the package, the server, teaching the assistant your application, state, API, look and texts, troubleshooting |
+| [Web](docs/web.md) | Blazor, Razor, .NET MAUI Blazor Hybrid; React, Vue, Svelte, Angular, Next.js (Vite, webpack, Next); a page without a bundler |
 | [Companion](docs/companion.md) | any other Windows application, without changing it |
 | [The `uiguide` tool](docs/cli.md) | all commands |
-| [Configuration reference](docs/configuration.md) | every setting: `uiguide.json`, `<script>` attributes, project properties, server `appsettings.json`, the application's registration |
+| [Configuration reference](docs/configuration.md) | every setting: `uiguide.json`, project properties and plugin options, the server's `server.json`, the application's registration |
 | [Your company's server](docs/company-server.md) | Docker, the administrator's lines, authentication, limits, metrics |
 | [How it works](docs/how-it-works.md) | the parts, the logic graph, the answer cache, learned navigation |
 | [Limits](docs/limits.md) | what is not supported yet, by kind of application |
 
 ## Your company's server
 
-In production the server runs once on a company machine (Docker) and your applications connect to it. The **administrator** installs it from this repository's release; the **developer** runs `uiguide init --server https://…` and sends the administrator the one line it prints — no files to edit, no restart. Full guide: [Your company's server](docs/company-server.md).
+In production the server runs once on a company machine (Docker) and your applications connect to it. The **administrator** starts it from its image (`docker pull ghcr.io/domitorai/ui-guide-agent-server`); the **developer** runs `uiguide init --server https://…` and sends the administrator the one line it prints — no files to edit, no restart. Full guide: [Your company's server](docs/company-server.md).
 
 ## Updating
 
-When a newer version is out you are told — with the lines to run — as the build warning `UIG002`, after any `uiguide` command and in the server log (at most once a day):
+When a newer version is out you are told — with the line to run — as the build warning `UIG002`, after any `uiguide` command and in the server log (at most once a day). Update like any package:
 
 ```powershell
-irm https://raw.githubusercontent.com/DomitorAI/ui-guide-agent/main/scripts/install.ps1 | iex   # tools + local server; settings and data are kept
-uiguide update                                                                                  # in each project folder
+dotnet add package UiGuideAgent.Desktop             # or UiGuideAgent.Web — npm: npm install -D @ui-guide-agent/web@latest
+dotnet tool update -g UiGuideAgent.Server.Host      # the server on your computer; your settings and data are kept
 ```
 
-Installed with `-NoServer`? The notice gives the `-NoServer` line. What each version brings: its [release notes](https://github.com/DomitorAI/ui-guide-agent/releases). Turn the notice off: `<UiGuideUpdateCheck>false</UiGuideUpdateCheck>` in the project or `UIGUIDE_NO_UPDATE_CHECK=1`.
+`uiguide update` in a project folder does the first line for you; the tools: `dotnet tool update -g UiGuideAgent.Cli` (and `UiGuideAgent.Companion`); Docker: `docker pull`, then the same `docker run`. What each version brings: its [release notes](https://github.com/DomitorAI/ui-guide-agent/releases). Turn the notice off: `<UiGuideUpdateCheck>false</UiGuideUpdateCheck>` in the project or `UIGUIDE_NO_UPDATE_CHECK=1`.
 
 ## Uninstall
 
-- **From one project** — in its folder: `uiguide remove` (`--dry-run` shows what it would do). It takes out the package, `uiguide.json`, the generated bundle, the `<script>` line and the registration on the local server; it keeps what you wrote (`uiguide.map.json`, `uiguide.tests.json`; `--all` deletes them too). With a company server it prints the line for the administrator.
-- **From this computer — everything:**
+- **From one project** — in its folder: `uiguide remove` (`--dry-run` shows what it would do). It takes out the package, `uiguide.json`, the generated files (bundle, the page's configuration), the `<script>` line and the registration on the local server; it keeps what you wrote (`uiguide.map.json`, `uiguide.tests.json`; `--all` deletes them too). With a company server it prints the line for the administrator. In an npm project: also remove the plugin line from your bundler's configuration and `npm uninstall @ui-guide-agent/web`.
+- **From this computer:**
   ```powershell
-  irm https://raw.githubusercontent.com/DomitorAI/ui-guide-agent/main/scripts/uninstall.ps1 | iex
+  dotnet tool uninstall -g UiGuideAgent.Server.Host   # and UiGuideAgent.Cli, UiGuideAgent.Companion if you installed them
   ```
-  The server, its settings and data, the tools, the NuGet source and the cached packages. It never changes your projects. `-KeepData` keeps the registered applications and the server settings.
+  The server's settings and data (registered applications, knowledge bundles, cached answers) stay in `%LOCALAPPDATA%\ui-guide-agent` (Linux / macOS: `~/.local/share/ui-guide-agent`) — delete that folder to remove them too.
 
 ## Feedback and custom development
 

@@ -6,46 +6,49 @@ Every setting in one place. Nothing here is needed to start — the defaults wor
 
 ## Your application
 
-### `uiguide.json` (desktop and Companion; next to the project, copied next to the executable)
+### `uiguide.json` (next to the project; created by the first build)
+
+The same file for desktop, web and Companion. On the desktop it is copied next to the executable; on the web the build writes it for the page as **`uiguide.config.json`** in the folder served as the site root (`wwwroot`, `public`, …) — don't edit that copy. In the build for your users (Release) both copies leave out an address of this computer (`localhost`).
 
 | Key | Default | Meaning |
 |---|---|---|
-| `server` | — (required) | the UiGuide Agent server, e.g. `http://localhost:5180` |
-| `appId` | — (required) | the application id registered on the server: lowercase letters, digits, `-` |
-| `language` | the application's UI culture | language of the assistant (BCP-47, e.g. `de-DE`) |
+| `server` | — | the UiGuide Agent server, e.g. `https://uiguide.example.com`; written by the build when a server answers on this computer, or by you. Missing = the application works, the assistant says it is not configured yet |
+| `appId` | the project's name | the application id registered on the server: lowercase letters, digits, `-` |
+| `language` | the application's UI culture (web: `<html lang>`) | language of the assistant (BCP-47, e.g. `de-DE`); for an application in one language without resource files, it is also the language the panel's texts are translated into |
 | `bundle` | `uiguide.bundle.json` | the knowledge bundle file |
-| `autoStart` | `true` | `false` = the assistant starts only from code (`UiGuide.Attach`) |
-| `observeNavigation` | `true` | `false` = never report which window a control opened ([learned navigation](how-it-works.md#learned-navigation)) |
+| `autoStart` | `true` | `false` = the assistant starts only from code (`UiGuide.Attach` / `uiGuide.start`) |
+| `observeNavigation` | `true` | `false` = never report which window or page a control opened ([learned navigation](how-it-works.md#learned-navigation)) |
 | `key` | — | application key, for a server where the application has `"auth": "AppKey"` (written by `uiguide init --server` / `uiguide key`) |
 | `position` | `bottom-right` | or `bottom-left` |
 | `theme` | — | `accent`, `background`, `foreground`, `userBubble`, `botBubble` (`#rgb` / `#rrggbb` / `#rrggbbaa`), `font` |
-| `texts` | built in (en, ro, ru) | your texts, for every language or per language — keys in [Look and texts](desktop.md#look-and-texts) |
+| `texts` | built in (English); the other languages translated at build | your texts, for every language or per language — keys in [Look and texts](desktop.md#look-and-texts) |
 
-### Web page (`<script>` attributes / `uiGuide.start({ … })`)
+### Web page from code (`uiGuide.start({ … })`)
 
-| Attribute | `start` option | Meaning |
-|---|---|---|
-| `data-app-id` | `appId` | the application id (required) |
-| `data-server` | `server` | the server (default `http://localhost:5180`) |
-| `data-bundle` | `bundle` | URL of `uiguide.bundle.json` (or the object) |
-| `data-language` | `language` | default: `<html lang>`, followed when it changes |
-| `data-position` | `position` | `bottom-left` / `bottom-right` |
-| `data-accent` | `theme` | accent color (`start` takes the whole theme) |
-| `data-key` | `token` | application key (`token` = a function returning the token) |
-| `data-observe="false"` | `observeNavigation: false` | never report which page a link opened |
-| — | `texts`, `screenId` | your texts; your own page id instead of the route |
+Only when you start the assistant yourself (`"autoStart": false`, or a page without the script tag). Same names as in `uiguide.json`: `server`, `appId`, `bundle` (URL or the object), `language`, `position`, `theme`, `texts`, `observeNavigation`, plus `token` (a function returning the key or the user's token) and `screenId` (your own page id instead of the route).
 
 Code: `uiGuide.setContext(key, value)`, `removeContext`, `clearContext`, `setLanguage`, `setToken(() => token)`, `stop()`.
 
-### Project file (MSBuild properties)
+### Project properties and plugin options
 
-| Property | Default | Meaning |
-|---|---|---|
-| `UiGuideAutoStart` | `true` | `false` = no automatic start; use `UiGuide.Attach` |
-| `UiGuideBundleOnBuild` | `true` | `false` = the build does not regenerate `uiguide.bundle.json` |
-| `UiGuideCheckNames` | `true` | `false` = no `UIG001` warnings about controls without a name |
-| `UiGuideNamesAsErrors` | `false` | `true` = those warnings are build errors |
-| `UiGuideUpdateCheck` | `true` | `false` = no `UIG002` update notice |
+What the build does for the assistant. .NET: properties in the project file; npm: options of the plugin (`uiGuide({ … })`).
+
+| Project property | Plugin option | Default | Meaning |
+|---|---|---|---|
+| `UiGuideSetup` | — | `true` | `false` = the build neither creates `uiguide.json` nor looks for a server |
+| `UiGuideForUsers` | — (the production build) | `true` in Release | the build for your users: no address of this computer in the copies |
+| `UiGuideAllowLocalServer` | `allowLocalServer` | `false` | `true` = the build for your users keeps a `localhost` address |
+| `UiGuideServerRequired` | `serverRequired` | `false` | `true` = no server address in the build for your users stops it (`UIG003` as an error) |
+| `UiGuidePanelTexts` | `panelTexts` | `true` | `false` = the panel's texts are not translated into your application's languages |
+| `UiGuideBundleOnBuild` | — | `true` | `false` = the build does not regenerate `uiguide.bundle.json` |
+| `UiGuideCheckNames` | `checkNames` | `true` | `false` = no `UIG001` warnings about controls without a name |
+| `UiGuideNamesAsErrors` | — | `false` | `true` = those warnings are build errors |
+| `UiGuideUpdateCheck` | — | `true` | `false` = no `UIG002` update notice |
+| `UiGuideAutoStart` | — | `true` | desktop: `false` = no automatic start; use `UiGuide.Attach` |
+| — | `publicDir` | the bundler's, else `public` | the folder served as the site root |
+| — | `inject` | `true` | `false` = the plugin does not add the assistant to the page (Vite: `index.html`; webpack: every entry) |
+
+Build messages: `UIG001` a control without a name, `UIG002` a newer version, `UIG003` no server address for your users, `UIG004` the panel's texts stay in English for some languages.
 
 ### Environment variables (developer machine / user's computer)
 
@@ -56,11 +59,13 @@ Code: `uiGuide.setContext(key, value)`, `removeContext`, `clearContext`, `setLan
 
 ### `uiguide.map.json` and `uiguide.tests.json`
 
-What you describe (`action`, `enabledWhen`, `visibleWhen`, `opens`, `label`, `flows`) and the benchmark questions (`question`, `screen`, `language`, `expect`, `avoid`): see [step 6 of the desktop guide](desktop.md#step-6--teach-the-assistant-your-application-recommended).
+What you describe (`action`, `enabledWhen`, `visibleWhen`, `opens`, `label`, `flows`) and the benchmark questions (`question`, `screen`, `language`, `expect`, `avoid`): see [step 4 of the desktop guide](desktop.md#step-4--teach-the-assistant-your-application-recommended).
 
 ## The server
 
-### `appsettings.json` (`%LOCALAPPDATA%\ui-guide-agent\server\`; Docker: environment variables, `:` → `__`)
+### `server.json` (`%LOCALAPPDATA%\ui-guide-agent\`; Linux / macOS `~/.local/share/ui-guide-agent/`; Docker: environment variables, `:` → `__`)
+
+Your settings, created at the server's first start and kept when it is updated. JSON with comments; a setting `A:B` is written `"A": { "B": … }`. Environment variables and the command line win over the file; `UIGUIDE_SETTINGS=<file>` uses another file.
 
 | Setting | Default | Meaning |
 |---|---|---|
