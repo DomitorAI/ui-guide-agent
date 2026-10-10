@@ -15,6 +15,6 @@ Python (PyQt / PySide / Tkinter), Java, Delphi, Electron, an exe without source:
    ```powershell
    uiguide-companion --config uiguide.json --run "python app.py"
    ```
-   While the application is used, the Companion also learns which control opens which window, like the desktop SDK ([learned navigation](how-it-works.md#learned-navigation)): ids and texts of your UI map only; off with `"observeNavigation": false` in `uiguide.json`. Tk exposes no controls to Windows, so a Tk application learns nothing this way (its routes come from the code).
+   While the application is used, the Companion also learns which control opens which window, like the desktop SDK ([learned navigation](how-it-works.md#learned-navigation)): ids and texts of your UI map only; off on the server (`"learnNavigation": false`). Tk exposes no controls to Windows, so a Tk application learns nothing this way (its routes come from the code).
 
    Or attach to a running one: `--process python` and/or `--window "My App*"`. The Companion ends with the application it started; `UIGUIDE_LOG=<file>` shows each step.

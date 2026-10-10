@@ -8,16 +8,14 @@ Every setting in one place. Nothing here is needed to start — the defaults wor
 
 ### `uiguide.json` (next to the project; created by the first build)
 
-The same file for desktop, web and Companion. On the desktop it is copied next to the executable; on the web the build writes it for the page as **`uiguide.config.json`** in the folder served as the site root (`wwwroot`, `public`, …) — don't edit that copy. In the build for your users (Release) both copies leave out an address of this computer (`localhost`).
+The same file for desktop, web and Companion. On the desktop it is copied next to the executable; on the web the build writes it for the page as **`uiguide.config.json`** in the folder served as the site root (`wwwroot`, `public`, …) — don't edit that copy. In the build for your users (every configuration other than Debug) both copies leave out an address of this computer (`localhost`). The knowledge bundle is always `uiguide.bundle.json` next to it.
 
 | Key | Default | Meaning |
 |---|---|---|
 | `server` | — | the UiGuide Agent server, e.g. `https://uiguide.example.com`; written by the build when a server answers on this computer, or by you. Missing = the application works, the assistant says it is not configured yet |
 | `appId` | the project's name | the application id registered on the server: lowercase letters, digits, `-` |
 | `language` | the application's UI culture (web: `<html lang>`) | language of the assistant (BCP-47, e.g. `de-DE`); for an application in one language without resource files, it is also the language the panel's texts are translated into |
-| `bundle` | `uiguide.bundle.json` | the knowledge bundle file |
 | `autoStart` | `true` | `false` = the assistant starts only from code (`UiGuide.Attach` / `uiGuide.start`) |
-| `observeNavigation` | `true` | `false` = never report which window or page a control opened ([learned navigation](how-it-works.md#learned-navigation)) |
 | `key` | — | application key, for a server where the application has `"auth": "AppKey"` (written by `uiguide init --server` / `uiguide key`) |
 | `position` | `bottom-right` | or `bottom-left` |
 | `theme` | — | `accent`, `background`, `foreground`, `userBubble`, `botBubble` (`#rgb` / `#rrggbb` / `#rrggbbaa`), `font` |
@@ -25,30 +23,29 @@ The same file for desktop, web and Companion. On the desktop it is copied next t
 
 ### Web page from code (`uiGuide.start({ … })`)
 
-Only when you start the assistant yourself (`"autoStart": false`, or a page without the script tag). Same names as in `uiguide.json`: `server`, `appId`, `bundle` (URL or the object), `language`, `position`, `theme`, `texts`, `observeNavigation`, plus `token` (a function returning the key or the user's token) and `screenId` (your own page id instead of the route).
+Only when you start the assistant yourself (`"autoStart": false`, or a page without the script tag). Same names as in `uiguide.json`: `server`, `appId`, `language`, `position`, `theme`, `texts`, plus `bundle` (the knowledge bundle: URL or the object), `token` (a function returning the key or the user's token) and `screenId` (your own page id instead of the route).
 
 Code: `uiGuide.setContext(key, value)`, `removeContext`, `clearContext`, `setLanguage`, `setToken(() => token)`, `stop()`.
 
-### Project properties and plugin options
+### Build messages and plugin options
 
-What the build does for the assistant. .NET: properties in the project file; npm: options of the plugin (`uiGuide({ … })`).
+The build needs no setting: every build sets the assistant up, generates the knowledge bundle and checks the names; Debug is your build, every other configuration is the build for your users. Its messages are ordinary build warnings:
 
-| Project property | Plugin option | Default | Meaning |
-|---|---|---|---|
-| `UiGuideSetup` | — | `true` | `false` = the build neither creates `uiguide.json` nor looks for a server |
-| `UiGuideForUsers` | — (the production build) | `true` in Release | the build for your users: no address of this computer in the copies |
-| `UiGuideAllowLocalServer` | `allowLocalServer` | `false` | `true` = the build for your users keeps a `localhost` address |
-| `UiGuideServerRequired` | `serverRequired` | `false` | `true` = no server address in the build for your users stops it (`UIG003` as an error) |
-| `UiGuidePanelTexts` | `panelTexts` | `true` | `false` = the panel's texts are not translated into your application's languages |
-| `UiGuideBundleOnBuild` | — | `true` | `false` = the build does not regenerate `uiguide.bundle.json` |
-| `UiGuideCheckNames` | `checkNames` | `true` | `false` = no `UIG001` warnings about controls without a name |
-| `UiGuideNamesAsErrors` | — | `false` | `true` = those warnings are build errors |
-| `UiGuideUpdateCheck` | — | `true` | `false` = no `UIG002` update notice |
-| `UiGuideAutoStart` | — | `true` | desktop: `false` = no automatic start; use `UiGuide.Attach` |
-| — | `publicDir` | the bundler's, else `public` | the folder served as the site root |
-| — | `inject` | `true` | `false` = the plugin does not add the assistant to the page (Vite: `index.html`; webpack: every entry) |
+| Code | Meaning |
+|---|---|
+| `UIG001` | a control without a name |
+| `UIG002` | a newer version |
+| `UIG003` | no server address for your users |
+| `UIG004` | the panel's texts stay in English for some languages |
 
-Build messages: `UIG001` a control without a name, `UIG002` a newer version, `UIG003` no server address for your users, `UIG004` the panel's texts stay in English for some languages.
+.NET: `<WarningsAsErrors>UIG001;UIG003</WarningsAsErrors>` in the project makes them errors, `<NoWarn>UIG001</NoWarn>` hides them.
+
+npm — options of the plugin (`uiGuide({ … })`):
+
+| Option | Default | Meaning |
+|---|---|---|
+| `publicDir` | the bundler's, else `public` | the folder served as the site root |
+| `serverRequired` | `false` | `true` = no server address in the build for your users stops it (`UIG003` as an error) |
 
 ### Environment variables (developer machine / user's computer)
 
@@ -101,4 +98,4 @@ Written by `uiguide init` (local server) or by the line the administrator runs (
 | `limits.questionsPerHour` / `questionsPerUserPerHour` / `maxConcurrent` | 0 (none) | quotas (the company-server line sets 1000 / 30 / 10) |
 | `origins` | — | web pages allowed to use the server (exact origins, never a wildcard) |
 | `cache` | `true` | `false` = no answer cache for this application |
-| `learnNavigation` | `true` | `false` = reports of this application are ignored |
+| `learnNavigation` | `true` | `false` = no [learned navigation](how-it-works.md#learned-navigation) for this application: its clients stop observing |

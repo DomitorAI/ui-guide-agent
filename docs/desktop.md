@@ -24,7 +24,7 @@ The first build has written **`uiguide.json`** next to your project (the applica
 |---|---|
 | .NET Framework 4.8 project with the default C# version (7.3) — the build output says *"UiGuide Agent: automatic start needs C# 9"* | add `<LangVersion>latest</LangVersion>` to the project, **or** start it from code: `UiGuide.Attach(this);` in your main window's constructor (WPF `Window` or WinForms `Form`), after `InitializeComponent();` |
 | the configuration is invalid | the reason is written to the debug output (Visual Studio → Output → Debug), prefixed `UiGuide:` — e.g. an invalid `appId` |
-| `"autoStart": false` or `<UiGuideAutoStart>false</UiGuideAutoStart>` | call `UiGuide.Attach(window)` yourself |
+| `"autoStart": false` in `uiguide.json` | call `UiGuide.Attach(window)` yourself |
 | none of the above | start the application with the environment variable `UIGUIDE_LOG` set to a file (PowerShell: `$env:UIGUIDE_LOG = "$env:TEMP\uiguide.log"; .\YourApp.exe`) — the SDK writes there each step: configuration read, which window it waits for, the button shown or the error |
 
 A login window shown **before** the main window gets the button too (the user can ask how to sign in); it moves to the main window once that appears.
@@ -86,7 +86,7 @@ Run your application, click the button and ask *"How do I …?"*: the answer nam
 | *The assistant is taking too long.* | the LLM did not answer in time (`Llm:TimeoutSeconds`, default 180) |
 | *Something went wrong. Please try again.* | most often: the `appId` is not registered on the server, or its file is not valid JSON — the server log says which |
 
-**From your computer to your users.** The Release build (and its installer) never carries an address of this computer: `localhost` is left out of the `uiguide.json` next to the executable, while your project keeps it. Until your users have an address (your company's server, step 2), every build warns `UIG003`; `<UiGuideServerRequired>true</UiGuideServerRequired>` makes it an error in the Release build. In the panel your users then see the assistant in their language — see [Look and texts](#look-and-texts).
+**From your computer to your users.** Every build other than Debug (Release and its installer) never carries an address of this computer: `localhost` is left out of the `uiguide.json` next to the executable, while your project keeps it. Until your users have an address (your company's server, step 2), every build warns `UIG003`; `<WarningsAsErrors>UIG003</WarningsAsErrors>` in the project makes it an error. In the panel your users then see the assistant in their language — see [Look and texts](#look-and-texts).
 
 ## Step 4 — Teach the assistant your application (recommended)
 
@@ -109,7 +109,7 @@ uiguide scan          # the same list in the console, and the coverage %; exit c
 uiguide scan --fix    # only copies the tooltip / hint / inner text YOU already wrote into the name — check it says what the control does
 ```
 
-`<UiGuideNamesAsErrors>true</UiGuideNamesAsErrors>` in the `.csproj` makes the warnings build errors; `<UiGuideCheckNames>false</UiGuideCheckNames>` turns the check off.
+`<WarningsAsErrors>UIG001</WarningsAsErrors>` in the `.csproj` makes the warnings build errors; `<NoWarn>UIG001</NoWarn>` hides them.
 
 **2. The knowledge bundle — made by every build.** The build reads your windows, their controls (with menus and shortcuts), **which control opens which window** and your UI texts in every language (resource dictionaries and `.resx` files; the language comes from the file or folder name, e.g. `lang.de-DE.xaml`, `Strings.de.resx`), and writes `uiguide.bundle.json` (only when something changed), copied next to your executable; the server receives it the first time a user asks a question with a new version. The first build also creates **`uiguide.map.json`** — the part you write. `uiguide bundle` does the same from the console.
 
@@ -156,7 +156,7 @@ uiguide scan --fix    # only copies the tooltip / hint / inner text YOU already 
 
 `uiguide test` (exit code 1 when an answer misses; `--repeat 3` asks each question three times, since an LLM may phrase answers differently; `--filter`, `--server`; it always asks the LLM, never the server's answer cache). `"A|B"` = either text; comparison ignores case, quotes and `…`.
 
-The more you describe, the better the answers: start with the main windows and the five tasks your users ask about most. `uiguide bundle --check` (exit code 1 when the bundle is not up to date) is meant for CI; `<UiGuideBundleOnBuild>false</UiGuideBundleOnBuild>` in the project turns the generation at build off.
+The more you describe, the better the answers: start with the main windows and the five tasks your users ask about most. `uiguide bundle --check` (exit code 1 when the bundle is not up to date) is meant for CI.
 
 **Already have a hand-written `uiguide.bundle.json`?** `uiguide bundle` will not overwrite it: `uiguide bundle --import` moves what it describes into `uiguide.map.json`, then generates.
 
@@ -203,8 +203,7 @@ Describe **state, not data**: `"customerSelected": true`, never the customer's n
 | `UiGuide.SetLanguage("de-DE")` | changes the language of the assistant (e.g. when your UI language changes) |
 | `UiGuide.IsAttached` | whether the assistant is shown on an open window |
 | `UiGuide.SetToken(() => session.AccessToken)` | the signed-in user's token, for a server where your application uses `"auth": "External"` |
-| `<UiGuideAutoStart>false</UiGuideAutoStart>` (project file) | no automatic start; use `UiGuide.Attach` |
-| `<UiGuideBundleOnBuild>false</UiGuideBundleOnBuild>` (project file) | the build does not regenerate `uiguide.bundle.json` |
+| `"autoStart": false` (`uiguide.json`) | no automatic start; use `UiGuide.Attach` |
 
 ### Look and texts
 
@@ -228,6 +227,6 @@ In `uiguide.json` (or `UiGuideOptions.Theme` / `Position` / `Texts` in code):
 }
 ```
 
-**The panel's texts in your users' languages.** The built-in texts are in English. When a build has a server, it asks it once to translate them into every language your UI has (the languages of your resource files, or `"language"` in `uiguide.json` for an application in one language) and writes the translations under `"texts"` — yours from then on, to check and change. Texts you already wrote are never replaced. When the server cannot translate them (warning `UIG004`), the panel stays in English for those languages and the next build asks again. `<UiGuidePanelTexts>false</UiGuidePanelTexts>` in the project turns this off.
+**The panel's texts in your users' languages.** The built-in texts are in English. When a build has a server, it asks it once to translate them into every language your UI has (the languages of your resource files, or `"language"` in `uiguide.json` for an application in one language) and writes the translations under `"texts"` — yours from then on, to check and change. Texts you already wrote are never replaced. When the server cannot translate them (warning `UIG004`), the panel stays in English for those languages and the next build asks again.
 
 Texts you can change: `open` (the round button's name), `title` (also of the assistant's message boxes), `greeting`, `placeholder`, `send`, `stop`, `clear`, `close`, `thinking` (`{s}` = seconds), `queued` (`{n}` = position), `stopped`, `errorBusy` (`{s}`), `errorTimeout`, `errorLlm`, `errorUnauthorized`, `errorNetwork`, `errorGeneric`, `errorNotConfigured`, `errorWebView2Missing`, `errorPanelStart`. The most specific language wins (`de-DE` over `de` over every language); a wrong color, an unknown setting or text is reported like any other configuration error (debug output, `UiGuide:`).

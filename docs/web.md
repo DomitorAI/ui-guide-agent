@@ -31,7 +31,7 @@ and one line in your bundler's configuration:
 | **Next.js** | `next.config.mjs`: `export default withUiGuide(nextConfig)` (`import { withUiGuide } from '@ui-guide-agent/web/next'`), and in `instrumentation-client.ts`: `import '@ui-guide-agent/web/auto';` |
 | others (Nuxt, SvelteKit, Astro, Angular CLI) | `npm install -D @ui-guide-agent/cli` too, a script in `package.json`: `"prebuild": "uiguide setup . --release --web-config public/uiguide.config.json && uiguide bundle ."` (SvelteKit: `static/` instead of `public/`), and `import '@ui-guide-agent/web/auto';` once in the browser part of your app |
 
-npm installs the `uiguide` tool of your computer with the package (Windows, Linux, macOS; x64 and Arm64) — no .NET. Plugin options: `uiGuide({ serverRequired: true, allowLocalServer: true, panelTexts: false, checkNames: false, inject: false, publicDir: '…' })` — see [Configuration](configuration.md#project-properties-and-plugin-options).
+npm installs the `uiguide` tool of your computer with the package (Windows, Linux, macOS; x64 and Arm64) — no .NET. Plugin options: `uiGuide({ serverRequired: true, publicDir: '…' })` — see [Configuration](configuration.md#build-messages-and-plugin-options).
 
 ## A page without a bundler
 

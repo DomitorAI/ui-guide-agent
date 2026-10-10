@@ -101,7 +101,7 @@ Something wrong? Run **`uiguide doctor`** in the project folder — it checks th
 
 ## From your computer to your users
 
-- **The address of this computer never reaches your users.** The Release build (`dotnet publish`, `vite build`, `next build`…) leaves a `localhost` address out of the configuration that ships with your application; `uiguide.json` in your project keeps it, so you keep testing locally. Until your users have a server address, every build warns `UIG003`; `<UiGuideServerRequired>true</UiGuideServerRequired>` (npm: `uiGuide({ serverRequired: true })`) makes it an error in the build for your users.
+- **The address of this computer never reaches your users.** The build for your users (every .NET configuration other than Debug, `vite build`, `next build`…) leaves a `localhost` address out of the configuration that ships with your application; `uiguide.json` in your project keeps it, so you keep testing locally. Until your users have a server address, every build warns `UIG003`; `<WarningsAsErrors>UIG003</WarningsAsErrors>` (npm: `uiGuide({ serverRequired: true })`) makes it an error.
 - **Your users' server** is your company's: `uiguide init --server https://…` once, then build and publish as usual.
 - **The panel in your application's languages.** The panel's own texts (title, buttons, messages) are built in for English. For the other languages of your application (its resource files, or `"language"` in `uiguide.json`) the build has your server's LLM translate them once and adds them to `"texts"` in `uiguide.json` — correct them there, they are never overwritten. Until then that language's panel is in English (warning `UIG004`). The answers always follow the language of the question.
 
@@ -131,7 +131,7 @@ dotnet add package UiGuideAgent.Desktop             # or UiGuideAgent.Web — np
 dotnet tool update -g UiGuideAgent.Server.Host      # the server on your computer; your settings and data are kept
 ```
 
-`uiguide update` in a project folder does the first line for you; the tools: `dotnet tool update -g UiGuideAgent.Cli` (and `UiGuideAgent.Companion`); Docker: `docker pull`, then the same `docker run`. What each version brings: its [release notes](https://github.com/DomitorAI/ui-guide-agent/releases). Turn the notice off: `<UiGuideUpdateCheck>false</UiGuideUpdateCheck>` in the project or `UIGUIDE_NO_UPDATE_CHECK=1`.
+`uiguide update` in a project folder does the first line for you; the tools: `dotnet tool update -g UiGuideAgent.Cli` (and `UiGuideAgent.Companion`); Docker: `docker pull`, then the same `docker run`. What each version brings: its [release notes](https://github.com/DomitorAI/ui-guide-agent/releases). Turn the notice off on a machine: `UIGUIDE_NO_UPDATE_CHECK=1` (it is also off when `CI=true`).
 
 ## Uninstall
 

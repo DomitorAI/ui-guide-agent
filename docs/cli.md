@@ -8,7 +8,7 @@ The build runs it for you; you need it in the console only for the commands belo
 |---|---|
 | `uiguide init` | connects the project to a server: writes `uiguide.json`, or updates the one the build created (only `server`, `appId`, `language` and `key` change; your other settings and comments stay); server check, registration on the local server (web: the allowed origins) — or, with `--server https://…` (your company's), the key and the one line for the administrator |
 | `uiguide setup` | what every build does by itself: `uiguide.json`, the server on this computer when it answers, the copy for your users, the panel's texts in your languages (you don't need to run it) |
-| `uiguide scan [--fix] [--msbuild [--errors]]` | controls without an accessible name — XAML, designer, C# code, Razor / HTML / Vue / Svelte / JSX, Python Qt / Tk (file:line, coverage); `--fix` only copies your own tooltip / hint text; `--msbuild` = the build warnings UIG001 |
+| `uiguide scan [--fix] [--msbuild]` | controls without an accessible name — XAML, designer, C# code, Razor / HTML / Vue / Svelte / JSX, Python Qt / Tk (file:line, coverage); `--fix` only copies your own tooltip / hint text; `--msbuild` = the build warnings UIG001 |
 | `uiguide bundle [--check \| --import]` | generates `uiguide.bundle.json` from the code + `uiguide.map.json`, including the logic graph (also done at every build) |
 | `uiguide record --goal "…"` | starts your application; the task you do once becomes a flow in `uiguide.map.json` |
 | `uiguide test [--repeat N]` | asks the questions of `uiguide.tests.json` and checks the names in the answers |
