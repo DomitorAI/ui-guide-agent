@@ -31,7 +31,7 @@
 
 **Not supported:** desktop applications on macOS or Linux, native mobile apps (iOS / Android, .NET MAUI without Blazor). Desktop users need Windows 10/11; web pages run in any current browser; the server runs on Windows or Linux (Docker).
 
-> **Preview (0.6)** — things may still change. What is not supported yet: [Limits](docs/limits.md).
+> **Preview** — things may still change. What is not supported yet: [Limits](docs/limits.md).
 
 ## How it works
 
