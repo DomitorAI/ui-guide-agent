@@ -24,7 +24,7 @@
 |---|---|---|---|
 | **WPF**, **WinForms** — .NET 8+ and .NET Framework 4.8 | NuGet `UiGuideAgent.Desktop`, no code | windows, controls, texts (`.resx`, resource dictionaries), event handlers, MVVM commands (CommunityToolkit, Prism-style `DelegateCommand`, ReactiveUI, Caliburn.Micro), shortcuts | ✔ |
 | **Blazor**, **Razor Pages / MVC**, **.NET MAUI Blazor Hybrid** | NuGet `UiGuideAgent.Web` + one `<script>` line | pages and `@page` routes, links, `NavigateTo` | ✔ |
-| **React**, **Vue**, **Svelte**, **Angular**, **Next.js**, **Nuxt** (Vite, webpack, Next) | npm `@ui-guide-agent/web` + one line in the bundler's configuration — no .NET needed | pages, router configuration (child routes, lazy modules) or folder routes, links, router calls | ✔ |
+| **React**, **Vue**, **Svelte**, **SvelteKit**, **Astro**, **Nuxt**, **Next.js**, **Angular** (Vite, webpack, Next) | npm `@ui-guide-agent/web` + one line in the framework's configuration — no .NET needed | pages, router configuration (child routes, lazy modules) or folder routes, links, router calls | ✔ |
 | plain **HTML** (no bundler) | one `<script>` line | pages, links | ✔ |
 | **Python** — PyQt 5/6, PySide 2/6, Tkinter, customtkinter | the Companion, no change to the app | windows, controls, `clicked.connect` / `command=` | Qt ✔ · Tk ✗ |
 | **Java** (Swing / JavaFX with the Access Bridge), **Delphi**, **Electron**, any Windows **exe** — also without source | the Companion, no change to the app | — (the assistant reads the screen) | ✔ when the app exposes its controls |

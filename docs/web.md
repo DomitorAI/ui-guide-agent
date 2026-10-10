@@ -16,7 +16,7 @@ and one line in your page, before `</body>` (`wwwroot/index.html`, `App.razor` o
 <script src="_content/UiGuideAgent.Web/ui-guide-agent.js"></script>
 ```
 
-## React, Vue, Svelte, Angular, Next.js… (no .NET needed)
+## React, Vue, Svelte, SvelteKit, Astro, Nuxt, Next.js, Angular… (no .NET needed)
 
 ```powershell
 npm install -D @ui-guide-agent/web
@@ -24,14 +24,17 @@ npm install -D @ui-guide-agent/web
 
 and one line in your bundler's configuration:
 
-| Bundler | The line |
+| Framework / bundler | The line |
 |---|---|
 | **Vite** (React, Vue, Svelte, Solid, Preact…) | `vite.config`: `import uiGuide from '@ui-guide-agent/web/vite'` and `plugins: [uiGuide()]` — the assistant is put in your page by itself |
+| **SvelteKit** | `vite.config`: `plugins: [sveltekit(), uiGuide()]` (`import uiGuide from '@ui-guide-agent/web/vite'`) — the same plugin; every page gets the assistant |
+| **Astro** | `astro.config`: `import uiGuide from '@ui-guide-agent/web/astro'` and `integrations: [uiGuide()]` — every page gets the assistant |
+| **Nuxt** | `nuxt.config`: `modules: ['@ui-guide-agent/web/nuxt']` — every page gets the assistant |
 | **webpack** 5 / Rspack | `import { UiGuidePlugin } from '@ui-guide-agent/web/webpack'` and `plugins: [new UiGuidePlugin()]` — added to every entry by itself |
 | **Next.js** | `next.config.mjs`: `export default withUiGuide(nextConfig)` (`import { withUiGuide } from '@ui-guide-agent/web/next'`), and in `instrumentation-client.ts`: `import '@ui-guide-agent/web/auto';` |
-| others (Nuxt, SvelteKit, Astro, Angular CLI) | `npm install -D @ui-guide-agent/cli` too, a script in `package.json`: `"prebuild": "uiguide setup . --release --web-config public/uiguide.config.json && uiguide bundle ."` (SvelteKit: `static/` instead of `public/`), and `import '@ui-guide-agent/web/auto';` once in the browser part of your app |
+| **Angular CLI** | `npm install -D @ui-guide-agent/cli` too, a script in `package.json`: `"prebuild": "uiguide setup . --release --web-config public/uiguide.config.json && uiguide bundle ."`, and `import '@ui-guide-agent/web/auto';` once in `main.ts` |
 
-npm installs the `uiguide` tool of your computer with the package (Windows, Linux, macOS; x64 and Arm64) — no .NET. Plugin options: `uiGuide({ serverRequired: true, publicDir: '…' })` — see [Configuration](configuration.md#build-messages-and-plugin-options).
+npm installs the `uiguide` tool of your computer with the package (Windows, Linux, macOS; x64 and Arm64) — no .NET. Options (rarely needed): `uiGuide({ serverRequired: true, publicDir: '…' })`; Nuxt: `modules: [['@ui-guide-agent/web/nuxt', { serverRequired: true }]]` — see [Configuration](configuration.md#build-messages-and-plugin-options).
 
 ## A page without a bundler
 
