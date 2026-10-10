@@ -156,9 +156,7 @@ uiguide scan --fix    # only copies the tooltip / hint / inner text YOU already 
 
 `uiguide test` (exit code 1 when an answer misses; `--repeat 3` asks each question three times, since an LLM may phrase answers differently; `--filter`, `--server`; it always asks the LLM, never the server's answer cache). `"A|B"` = either text; comparison ignores case, quotes and `…`.
 
-The more you describe, the better the answers: start with the main windows and the five tasks your users ask about most. `uiguide bundle --check` (exit code 1 when the bundle is not up to date) is meant for CI.
-
-**Already have a hand-written `uiguide.bundle.json`?** `uiguide bundle` will not overwrite it: `uiguide bundle --import` moves what it describes into `uiguide.map.json`, then generates.
+The more you describe, the better the answers: start with the main windows and the five tasks your users ask about most.
 
 ### The application profile
 
