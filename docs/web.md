@@ -38,7 +38,7 @@ npm installs the `uiguide` tool of your computer with the package (Windows, Linu
 
 ## A page without a bundler
 
-Copy `ui-guide-agent.js` from the [release](https://github.com/DomitorAI/ui-guide-agent/releases/latest) next to your page and add `<script src="ui-guide-agent.js"></script>`. `uiguide init` (in the folder with `package.json`) writes `uiguide.config.json` next to it — run it again after changing the server.
+Copy `ui-guide-agent.js` from the [release](https://github.com/DomitorAI/ui-guide-agent/releases/latest) next to your pages and add `<script src="ui-guide-agent.js"></script>` before `</body>` in each. In the folder of your pages (no `package.json` needed; `dotnet tool install -g UiGuideAgent.Cli` once): `uiguide init` writes `uiguide.config.json` next to them — run it again after changing the server — and `uiguide bundle` the knowledge bundle, again after you change your pages. `uiguide update` replaces `ui-guide-agent.js` with the latest one.
 
 ## What the build does
 
@@ -55,7 +55,7 @@ Without a server the page works and the assistant answers *"The assistant is not
 
 ## Name the controls the browser way
 
-`aria-label="Export orders"`, a `<label for="…">`, the button's text. An icon alone is not a name; a `<div @onclick>` / `<span onClick>` is reported too — it is not a control (use a `<button>`). The UI map's screens get their `route` from `@page "/…"`, from your router configuration (Vue Router, React Router, Angular routes) or from your folders (Next.js `pages/` and `app/…/page.tsx`, Nuxt `pages/`, SvelteKit `src/routes/…/+page.svelte`), so the assistant knows the page the user is on; links and router calls (`href`, `to`, `routerLink`, `navigate('/…')`, `router.push('/…')`, `goto('/…')`, also in the method a click handler calls) become the logic graph.
+`aria-label="Export orders"`, a `<label for="…">` or a `<label>` around the field, the button's text. An icon alone is not a name; a `<div @onclick>` / `<span onClick>` is reported too — it is not a control (use a `<button>`). Read: Razor, HTML, Vue, Svelte, Astro, JSX / TSX (also JSX in `.js` files). The UI map's screens get their `route` from `@page "/…"`, from your router configuration (Vue Router, React Router, Angular routes) or from your folders (Next.js `pages/` and `app/…/page.js|tsx`, Nuxt `pages/`, SvelteKit `src/routes/…/+page.svelte`, Astro `src/pages/…`), so the assistant knows the page the user is on; links and router calls (`href`, `to`, `routerLink`, `navigate('/…')`, `navigateTo('/…')`, `router.push('/…')`, `goto('/…')`, also in the method a click handler calls) become the logic graph.
 
 ## From code (optional)
 
