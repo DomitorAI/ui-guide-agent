@@ -80,7 +80,9 @@ A label that repeats a control's value is dropped too (some UI frameworks expose
 |---|---|
 | WPF / WinForms | `dotnet add package UiGuideAgent.Desktop` — no code |
 | Blazor / Razor / .NET MAUI Blazor | `dotnet add package UiGuideAgent.Web`, and one line in your page: `<script src="_content/UiGuideAgent.Web/ui-guide-agent.js"></script>` |
-| React, Vue, Svelte… (Vite) | `npm install -D @ui-guide-agent/web`, and in `vite.config`: `plugins: [uiGuide()]` (`import uiGuide from '@ui-guide-agent/web/vite'`) — webpack, Next.js: [Web](docs/web.md) |
+| React, Vue, Svelte… (Vite) | `npm install -D @ui-guide-agent/web`, and in `vite.config`: `plugins: [uiGuide()]` (`import uiGuide from '@ui-guide-agent/web/vite'`) |
+| SvelteKit, Astro, Nuxt, Next.js, webpack, Angular CLI | `npm install -D @ui-guide-agent/web` and the one line of your framework (Angular CLI: two npm scripts and one import) — [Web](docs/web.md) |
+| A page without a bundler | `ui-guide-agent.js` from the release next to your pages, and one `<script>` line — [Web](docs/web.md#a-page-without-a-bundler) |
 | Python, Java, any exe | the Companion — [Companion](docs/companion.md) |
 
 Build and run. Your application works as before, with the assistant's round button; the assistant answers *"The assistant is not configured yet."* and the build warns `UIG003` — it has no server yet. The build has written `uiguide.json` next to your project (the application id from its name) and, at every build, reads your windows / pages for the assistant and warns `UIG001` about controls without a name.
