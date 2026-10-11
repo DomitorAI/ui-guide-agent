@@ -32,7 +32,7 @@ and one line in your bundler's configuration:
 | **Nuxt** | `nuxt.config`: `modules: ['@ui-guide-agent/web/nuxt']` — every page gets the assistant |
 | **webpack** 5 / Rspack | `import { UiGuidePlugin } from '@ui-guide-agent/web/webpack'` and `plugins: [new UiGuidePlugin()]` — added to every entry by itself |
 | **Next.js** | `next.config.mjs`: `export default withUiGuide(nextConfig)` (`import { withUiGuide } from '@ui-guide-agent/web/next'`), and in `instrumentation-client.ts`: `import '@ui-guide-agent/web/auto';` |
-| **Angular CLI** | `npm install -D @ui-guide-agent/cli` too, a script in `package.json`: `"prebuild": "uiguide setup . --release --web-config public/uiguide.config.json && uiguide bundle ."`, and `import '@ui-guide-agent/web/auto';` once in `main.ts` |
+| **Angular CLI** | its build takes no plugin, so two scripts in `package.json`: `"prestart": "uiguide prepare"` and `"prebuild": "uiguide prepare --release"`, and `import '@ui-guide-agent/web/auto';` once in `src/main.ts` — `npm start` and `npm run build` then do the same as the other frameworks |
 
 npm installs the `uiguide` tool of your computer with the package (Windows, Linux, macOS; x64 and Arm64) — no .NET. Options (rarely needed): `uiGuide({ serverRequired: true, publicDir: '…' })`; Nuxt: `modules: [['@ui-guide-agent/web/nuxt', { serverRequired: true }]]` — see [Configuration](configuration.md#build-messages-and-plugin-options).
 

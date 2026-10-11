@@ -27,6 +27,8 @@ An application with no .NET or npm build of its own (Python, Java, any exe with 
 | `uiguide scan [--fix]` | controls without an accessible name — XAML, designer, C# code, Razor / HTML / Vue / Svelte / JSX, Python Qt / Tk (file:line, coverage); `--fix` only copies your own tooltip / hint text into the name |
 | `uiguide bundle` | generates `uiguide.bundle.json` from the code + `uiguide.map.json`, including the logic graph |
 
+Angular CLI has no build plugin: npm runs `uiguide prepare` for you from `"prestart"` / `"prebuild"` (see [Web](web.md)) — the server address, the page's configuration in `public/`, the knowledge bundle and the warnings, as the other frameworks' builds do. `--release` leaves an address of this computer out of the build for your users.
+
 Exit codes: `0` ok, `1` problems found (`scan`, `test`, `doctor`), `2` wrong usage.
 
 **`uiguide update`** moves the project to the latest release: .NET — `dotnet add package UiGuideAgent.Desktop` / `UiGuideAgent.Web`; npm — `npm install -D @ui-guide-agent/web@latest`; a page with a copied `ui-guide-agent.js` — the file is replaced.
