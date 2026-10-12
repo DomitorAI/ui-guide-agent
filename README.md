@@ -141,12 +141,26 @@ dotnet tool update -g UiGuideAgent.Server.Host      # the server on your compute
 
 ## Uninstall
 
-- **From one project** — in its folder: `uiguide remove` (`--dry-run` shows what it would do). It takes out the package, `uiguide.json`, the generated files (bundle, the page's configuration), the `<script>` line and the registration on the local server; it keeps what you wrote (`uiguide.map.json`, `uiguide.tests.json`; `--all` deletes them too). With a company server it prints the line for the administrator. In an npm project: also remove the plugin line from your bundler's configuration and `npm uninstall @ui-guide-agent/web`.
-- **From this computer:**
-  ```powershell
-  dotnet tool uninstall -g UiGuideAgent.Server.Host   # and UiGuideAgent.Cli, UiGuideAgent.Companion if you installed them
-  ```
-  The server's settings and data (registered applications, knowledge bundles, cached answers) stay in `%LOCALAPPDATA%\ui-guide-agent` (Linux / macOS: `~/.local/share/ui-guide-agent`) — delete that folder to remove them too.
+**With one command** — in the project folder:
+
+```powershell
+uiguide remove
+```
+
+It shows what it removes and asks before deleting anything:
+
+- **from the project** — the package, `uiguide.json`, `uiguide.bundle.json`, `uiguide.tests.json`, `uiguide.config.json`, the `<script>` line of your pages, the scripts and packages in `package.json` (npm), and your application on the local server. It keeps only `uiguide.map.json` — you wrote it; delete it yourself if you no longer need it. With your company's server it prints the one line for the administrator.
+- **then, if you want, from this computer** — the local server (stopped first) with its settings and data, the Companion, the `uiguide` tool itself, the UiGuide Agent packages in the NuGet cache. Outside a project folder `uiguide remove` offers only this.
+
+If your code still uses UiGuide Agent (`UiGuide.SetContext(…)`, the plugin line in `vite.config`, …) it changes nothing and lists those lines with file and line — remove them, then run it again. In scripts: `uiguide remove --yes` (`--yes --computer` also from this computer).
+
+**From Visual Studio only** (NuGet → Uninstall): the package is removed and the assistant is gone, but Visual Studio cannot do the rest. Delete by hand, in the project folder: `uiguide.json`, `uiguide.bundle.json`, `uiguide.tests.json` (and `uiguide.map.json` if you no longer need it); Blazor / Razor: also `wwwroot/uiguide.bundle.json`, `wwwroot/uiguide.config.json` and the `<script src="_content/UiGuideAgent.Web/ui-guide-agent.js">` line of your page. If you ran the server on your computer:
+
+```powershell
+dotnet tool uninstall -g UiGuideAgent.Server.Host
+```
+
+and delete the folder `%LOCALAPPDATA%\ui-guide-agent` (Linux / macOS: `~/.local/share/ui-guide-agent`) — the server's settings and data.
 
 ## Feedback and custom development
 
