@@ -85,6 +85,10 @@ A label that repeats a control's value is dropped too (some UI frameworks expose
 | A page without a bundler | `ui-guide-agent.js` from the release next to your pages, and one `<script>` line — [Web](docs/web.md#a-page-without-a-bundler) |
 | Python, Java, any exe | the Companion — [Companion](docs/companion.md) |
 
+Searching for **UiGuideAgent** in Visual Studio's NuGet package manager: add **UiGuideAgent.Desktop** or **UiGuideAgent.Web** to your project; the others are .NET tools, installed once from a command line (`dotnet tool install -g …`), not into a project.
+
+![UiGuideAgent packages in Visual Studio's NuGet package manager](docs/images/nuget-search.png)
+
 Build and run. Your application works as before, with the assistant's round button; the assistant answers *"The assistant is not configured yet."* and the build warns `UIG003` — it has no server yet. The build has written `uiguide.json` next to your project (the application id from its name) and, at every build, reads your windows / pages for the assistant and warns `UIG001` about controls without a name.
 
 **2. Connect a server — once, then rebuild.** No code; nothing in your application changes.
