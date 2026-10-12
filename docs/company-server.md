@@ -6,17 +6,37 @@
 
 **The administrator** installs the server once — with Docker or as a Windows service; the developer hands over nothing but the lines below, and the server is the same for every application. Either way it starts with the machine, and after a crash it is restarted up to 3 times, then it stays stopped until the administrator starts it, with the reason in the log.
 
-**Docker:**
+**Docker** — the ready image `ghcr.io/domitorai/ui-guide-agent-server` (nothing to build). Recommended: [docker-compose.yml](docker-compose.yml) — copy it to a folder on the server and put an `.env` file next to it (keep it out of version control; it holds the key):
+
+```ini
+LLM_BASE_URL=https://your-llm/v1
+LLM_MODEL=your-model
+LLM_API_KEY=...
+# recommended: an embedding model on the same endpoint (see below)
+LLM_EMBEDDING_MODEL=bge-m3
+# optional: lets Prometheus read /metrics from the network; behind a reverse proxy: its IP address(es)
+UIGUIDE_METRICS_KEY=
+UIGUIDE_TRUSTED_PROXIES=
+# optional: a fixed version instead of the latest, e.g. 0.11.0
+UIGUIDE_VERSION=latest
+```
 
 ```bash
-docker pull ghcr.io/domitorai/ui-guide-agent-server:latest
+docker compose up -d                       # starts it: container uiguide, port 8080, data on the volume uiguide-data
+docker compose logs uiguide                # why it stopped
+docker compose pull && docker compose up -d  # update — registrations, bundles and cached answers stay on the volume
+```
+
+Without compose, the same in one line:
+
+```bash
 docker run -d --name uiguide --restart on-failure:3 -p 8080:8080 -v uiguide-data:/data \
   -e Llm__BaseUrl=https://your-llm/v1 -e Llm__Model=your-model -e Llm__ApiKey=… \
   -e Llm__EmbeddingModel=bge-m3 \
   ghcr.io/domitorai/ui-guide-agent-server:latest
 ```
 
-or with [docker-compose.yml](docker-compose.yml) (same container name, `uiguide`). Why it stopped: `docker logs uiguide`; start it again: `docker start uiguide`. Updating: `docker pull ghcr.io/domitorai/ui-guide-agent-server:latest`, `docker rm -f uiguide`, then the same `docker run` line — the registrations and bundles stay on the volume.
+(why it stopped: `docker logs uiguide`; start it again: `docker start uiguide`; update: `docker pull ghcr.io/domitorai/ui-guide-agent-server:latest`, `docker rm -f uiguide`, then the same line).
 
 **Windows server** (no Docker), in an administrator terminal — needs the .NET 10 SDK installed for all users:
 

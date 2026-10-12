@@ -14,6 +14,7 @@
 #   "auth": "AppKey"   + "keys": ["sha256:..."]   (uiguide init / uiguide key), with "limits";
 #   "auth": "External" + "validation": { "url": "https://your-app/api/me" }   (the user's token is checked there).
 # "auth": "None" answers only requests made inside the container (never from the network).
+name: uiguide
 services:
   uiguide:
     image: ghcr.io/domitorai/ui-guide-agent-server:${UIGUIDE_VERSION:-latest}
@@ -35,4 +36,6 @@ services:
       UiGuide__TrustedProxies: ${UIGUIDE_TRUSTED_PROXIES:-}
 
 volumes:
+  # the same volume as the docker run line in the documentation, whatever the folder of this file
   uiguide-data:
+    name: uiguide-data
