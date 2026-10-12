@@ -46,7 +46,7 @@ Its first start creates your settings, `%LOCALAPPDATA%\ui-guide-agent\server.jso
 "Llm": {
   "BaseUrl": "http://your-llm-host:4000/v1",   // OpenAI-compatible endpoint, including /v1
   "Model": "your-model-name",
-  "EmbeddingModel": ""                           // optional, e.g. "nomic-embed-text": see "Answer cache" in how-it-works.md
+  "EmbeddingModel": ""                           // recommended, e.g. "bge-m3": see "Answer cache" in how-it-works.md
 }
 ```
 

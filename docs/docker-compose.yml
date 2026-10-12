@@ -4,6 +4,8 @@
 #   LLM_BASE_URL=https://llm.example.com/v1
 #   LLM_MODEL=qwen3
 #   LLM_API_KEY=...            (empty for a local Ollama)
+#   LLM_EMBEDDING_MODEL=bge-m3 (recommended: an embedding model on the same endpoint; questions asked in other words
+#                               are answered from the cache too; check: /api/v1/health -> "embeddings": "ok")
 #   UIGUIDE_METRICS_KEY=...    (optional: lets Prometheus read /metrics from the network)
 #
 # Applications: data/apps/<appId>.json on the volume, written by one line run here (the developer's uiguide init /
@@ -12,12 +14,14 @@
 #   "auth": "AppKey"   + "keys": ["sha256:..."]   (uiguide init / uiguide key), with "limits";
 #   "auth": "External" + "validation": { "url": "https://your-app/api/me" }   (the user's token is checked there).
 # "auth": "None" answers only requests made inside the container (never from the network).
+name: uiguide
 services:
   uiguide:
     image: ghcr.io/domitorai/ui-guide-agent-server:${UIGUIDE_VERSION:-latest}
     # the name used by the administrator lines: docker exec uiguide dotnet uiguide-server.dll app ...
     container_name: uiguide
-    restart: unless-stopped
+    # starts with Docker; after a crash restarted up to 3 times, then stopped (why: docker logs uiguide)
+    restart: on-failure:3
     ports:
       - "8080:8080"
     volumes:
@@ -26,9 +30,12 @@ services:
       Llm__BaseUrl: ${LLM_BASE_URL:?set LLM_BASE_URL}
       Llm__Model: ${LLM_MODEL:?set LLM_MODEL}
       Llm__ApiKey: ${LLM_API_KEY:-}
+      Llm__EmbeddingModel: ${LLM_EMBEDDING_MODEL:-}
       UiGuide__MetricsKey: ${UIGUIDE_METRICS_KEY:-}
       # behind a reverse proxy: its IP address(es), so the per-user limits see the real client address
       UiGuide__TrustedProxies: ${UIGUIDE_TRUSTED_PROXIES:-}
 
 volumes:
+  # the same volume as the docker run line in the documentation, whatever the folder of this file
   uiguide-data:
+    name: uiguide-data

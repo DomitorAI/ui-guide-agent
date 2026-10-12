@@ -69,7 +69,7 @@ A label that repeats a control's value is dropped too (some UI frameworks expose
 
 - Developer machine: the [.NET SDK](https://dotnet.microsoft.com/download) 8+ for .NET applications; Node.js 20+ for the others (no .NET needed).
 - Your users: Windows 10/11 with the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) (preinstalled on Windows 11) for desktop applications; any current browser for web pages.
-- The server: on your computer the [.NET SDK](https://dotnet.microsoft.com/download) 10+ (it is a .NET tool) or Docker; for your company Docker (Linux or Windows).
+- The server: on your computer the [.NET SDK](https://dotnet.microsoft.com/download) 10+ (it is a .NET tool) or Docker; for your company Docker (Linux or Windows) or a Windows service (the same .NET tool).
 - An OpenAI-compatible LLM endpoint — used only by the server.
 
 ## Quick start
@@ -120,13 +120,13 @@ Something wrong? Run **`uiguide doctor`** in the project folder — it checks th
 | [Companion](docs/companion.md) | any other Windows application, without changing it |
 | [The `uiguide` tool](docs/cli.md) | all commands |
 | [Configuration reference](docs/configuration.md) | every setting: `uiguide.json`, project properties and plugin options, the server's `server.json`, the application's registration |
-| [Your company's server](docs/company-server.md) | Docker, the administrator's lines, authentication, limits, metrics |
+| [Your company's server](docs/company-server.md) | Docker or a Windows service, the administrator's lines, authentication, limits, metrics |
 | [How it works](docs/how-it-works.md) | the parts, the logic graph, the answer cache, learned navigation |
 | [Limits](docs/limits.md) | what is not supported yet, by kind of application |
 
 ## Your company's server
 
-In production the server runs once on a company machine (Docker) and your applications connect to it. The **administrator** starts it from its image (`docker pull ghcr.io/domitorai/ui-guide-agent-server`); the **developer** runs `uiguide init --server https://…` and sends the administrator the one line it prints — no files to edit, no restart. Full guide: [Your company's server](docs/company-server.md).
+In production the server runs once on a company machine and your applications connect to it. The **administrator** installs it once — from its Docker image (`docker pull ghcr.io/domitorai/ui-guide-agent-server`) or, on a Windows server, as a Windows service (`uiguide-server service install`); it starts with the machine and is restarted after a crash; the **developer** runs `uiguide init --server https://…` and sends the administrator the one line it prints — no files to edit, no restart. Full guide: [Your company's server](docs/company-server.md).
 
 ## Updating
 
@@ -141,12 +141,26 @@ dotnet tool update -g UiGuideAgent.Server.Host      # the server on your compute
 
 ## Uninstall
 
-- **From one project** — in its folder: `uiguide remove` (`--dry-run` shows what it would do). It takes out the package, `uiguide.json`, the generated files (bundle, the page's configuration), the `<script>` line and the registration on the local server; it keeps what you wrote (`uiguide.map.json`, `uiguide.tests.json`; `--all` deletes them too). With a company server it prints the line for the administrator. In an npm project: also remove the plugin line from your bundler's configuration and `npm uninstall @ui-guide-agent/web`.
-- **From this computer:**
-  ```powershell
-  dotnet tool uninstall -g UiGuideAgent.Server.Host   # and UiGuideAgent.Cli, UiGuideAgent.Companion if you installed them
-  ```
-  The server's settings and data (registered applications, knowledge bundles, cached answers) stay in `%LOCALAPPDATA%\ui-guide-agent` (Linux / macOS: `~/.local/share/ui-guide-agent`) — delete that folder to remove them too.
+**With one command** — in the project folder:
+
+```powershell
+uiguide remove
+```
+
+It shows what it removes and asks before deleting anything:
+
+- **from the project** — the package, `uiguide.json`, `uiguide.bundle.json`, `uiguide.tests.json`, `uiguide.config.json`, the `<script>` line of your pages, the scripts and packages in `package.json` (npm), and your application on the local server. It keeps only `uiguide.map.json` — you wrote it; delete it yourself if you no longer need it. With your company's server it prints the one line for the administrator.
+- **then, if you want, from this computer** — the local server (stopped first) with its settings and data, the Companion, the `uiguide` tool itself, the UiGuide Agent packages in the NuGet cache. Outside a project folder `uiguide remove` offers only this.
+
+If your code still uses UiGuide Agent (`UiGuide.SetContext(…)`, the plugin line in `vite.config`, …) it changes nothing and lists those lines with file and line — remove them, then run it again. In scripts: `uiguide remove --yes` (`--yes --computer` also from this computer).
+
+**From Visual Studio only** (NuGet → Uninstall): the package is removed and the assistant is gone, but Visual Studio cannot do the rest. Delete by hand, in the project folder: `uiguide.json`, `uiguide.bundle.json`, `uiguide.tests.json` (and `uiguide.map.json` if you no longer need it); Blazor / Razor: also `wwwroot/uiguide.bundle.json`, `wwwroot/uiguide.config.json` and the `<script src="_content/UiGuideAgent.Web/ui-guide-agent.js">` line of your page. If you ran the server on your computer:
+
+```powershell
+dotnet tool uninstall -g UiGuideAgent.Server.Host
+```
+
+and delete the folder `%LOCALAPPDATA%\ui-guide-agent` (Linux / macOS: `~/.local/share/ui-guide-agent`) — the server's settings and data.
 
 ## Feedback and custom development
 

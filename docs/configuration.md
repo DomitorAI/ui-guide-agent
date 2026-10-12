@@ -60,7 +60,7 @@ What you describe (`action`, `enabledWhen`, `visibleWhen`, `opens`, `label`, `fl
 
 ## The server
 
-### `server.json` (`%LOCALAPPDATA%\ui-guide-agent\`; Linux / macOS `~/.local/share/ui-guide-agent/`; Docker: environment variables, `:` → `__`)
+### `server.json` (`%LOCALAPPDATA%\ui-guide-agent\`; Linux / macOS `~/.local/share/ui-guide-agent/`; the Windows service: `C:\ProgramData\ui-guide-agent\`; Docker: environment variables, `:` → `__`)
 
 Your settings, created at the server's first start and kept when it is updated. JSON with comments; a setting `A:B` is written `"A": { "B": … }`. Environment variables and the command line win over the file; `UIGUIDE_SETTINGS=<file>` uses another file.
 
@@ -69,10 +69,10 @@ Your settings, created at the server's first start and kept when it is updated. 
 | `Urls` | `http://localhost:5180` | where the server listens (Docker: `8080`) |
 | `Llm:BaseUrl` | — | your OpenAI-compatible endpoint, including `/v1` |
 | `Llm:Model` | — | the model name |
-| `Llm:ApiKey` | — | **only** as the environment variable `Llm__ApiKey`; unset = no authentication |
-| `Llm:EmbeddingModel` | empty | an embedding model on the same endpoint: cached answers also for questions in other words |
+| `Llm:ApiKey` | — | **only** as the environment variable `Llm__ApiKey` (the Windows service: `uiguide-server service key`); unset = no authentication |
+| `Llm:EmbeddingModel` | empty | **recommended:** an embedding model on the same endpoint (e.g. `bge-m3`): questions asked in other words are answered from the [cache](how-it-works.md#answer-cache) too; health: `"embeddings"` |
 | `Llm:MaxTokens` / `Temperature` / `TimeoutSeconds` / `ContextLimitTokens` | 32000 / 0.3 / 180 / 86016 | the LLM call |
-| `UiGuide:DataPath` | `%LOCALAPPDATA%\ui-guide-agent\data` (Docker `/data`) | registrations, bundles, cache, learned navigation |
+| `UiGuide:DataPath` | `%LOCALAPPDATA%\ui-guide-agent\data` (Docker `/data`; the Windows service `C:\ProgramData\ui-guide-agent\data`) | registrations, bundles, cache, learned navigation |
 | `UiGuide:Queue:Slots` / `MaxWaiting` / `WaitTimeoutSeconds` | 0 / 30 / 120 | own queue in front of the LLM; 0 = none |
 | `UiGuide:Sessions:IdleMinutes` / `MaxSessions` | 30 / 5000 | conversations kept in memory |
 | `UiGuide:Bundles:MaxBytes` / `RetentionDays` / `MemoryCacheSize` | 2 MB / 180 / 10 | knowledge bundles; deleted after 180 days unused |
