@@ -40,4 +40,4 @@ The administrator pastes it on the server — no file to edit, no restart. The l
 
 **Metrics** for Prometheus: `GET /metrics` — questions per application and outcome, refusals, answer times, prompt tokens and LLM cache hits; readable on the server's own computer, from the network only with `-e UiGuide__MetricsKey=…`. The text of questions is never logged or counted. Behind a reverse proxy set `UiGuide__TrustedProxies` to its IP address.
 
-**Other ways to run the server** (packages in the release, not yet on NuGet.org): `UiGuideAgent.Server.Host` — the same server as a .NET tool (`dotnet tool install -g UiGuideAgent.Server.Host`, command `uiguide-server`); `UiGuideAgent.Server` — the server inside your own ASP.NET Core application (`AddUiGuideAgentServer()` + `MapUiGuideAgent()`).
+**Without Docker:** the same server as a .NET tool — `dotnet tool install -g UiGuideAgent.Server.Host`, command `uiguide-server`, with `"Urls"` in its `server.json` set to the network address.
