@@ -10,8 +10,11 @@
 docker pull ghcr.io/domitorai/ui-guide-agent-server:latest
 docker run -d --name uiguide --restart unless-stopped -p 8080:8080 -v uiguide-data:/data \
   -e Llm__BaseUrl=https://your-llm/v1 -e Llm__Model=your-model -e Llm__ApiKey=… \
+  -e Llm__EmbeddingModel=bge-m3 \
   ghcr.io/domitorai/ui-guide-agent-server:latest
 ```
+
+**Recommended: an embedding model** (`Llm__EmbeddingModel`, served by the same LLM endpoint, e.g. `bge-m3`). Questions asked in other words are then answered from the [answer cache](how-it-works.md#answer-cache) too — fewer LLM calls, answers in milliseconds. Without it the server works; only identical questions match. Check: `https://<server>/api/v1/health` → `"embeddings": "ok"`. The cache itself — storing, matching, deleting after 180 days — needs nothing from you.
 
 or with [docker-compose.yml](docker-compose.yml) (same container name, `uiguide`). A server without Docker: `dotnet tool install -g UiGuideAgent.Server.Host` (the .NET SDK 10 or newer), then `uiguide-server` with `"Urls"` in its `server.json` set to the network address (e.g. `"http://0.0.0.0:5180"`). Updating: `docker pull ghcr.io/domitorai/ui-guide-agent-server:latest`, `docker rm -f uiguide`, then the same `docker run` line — the registrations and bundles stay on the volume (without Docker: `dotnet tool update -g UiGuideAgent.Server.Host`).
 

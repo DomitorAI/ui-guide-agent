@@ -4,6 +4,8 @@
 #   LLM_BASE_URL=https://llm.example.com/v1
 #   LLM_MODEL=qwen3
 #   LLM_API_KEY=...            (empty for a local Ollama)
+#   LLM_EMBEDDING_MODEL=bge-m3 (recommended: an embedding model on the same endpoint; questions asked in other words
+#                               are answered from the cache too; check: /api/v1/health -> "embeddings": "ok")
 #   UIGUIDE_METRICS_KEY=...    (optional: lets Prometheus read /metrics from the network)
 #
 # Applications: data/apps/<appId>.json on the volume, written by one line run here (the developer's uiguide init /
@@ -26,6 +28,7 @@ services:
       Llm__BaseUrl: ${LLM_BASE_URL:?set LLM_BASE_URL}
       Llm__Model: ${LLM_MODEL:?set LLM_MODEL}
       Llm__ApiKey: ${LLM_API_KEY:-}
+      Llm__EmbeddingModel: ${LLM_EMBEDDING_MODEL:-}
       UiGuide__MetricsKey: ${UIGUIDE_METRICS_KEY:-}
       # behind a reverse proxy: its IP address(es), so the per-user limits see the real client address
       UiGuide__TrustedProxies: ${UIGUIDE_TRUSTED_PROXIES:-}
