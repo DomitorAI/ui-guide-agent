@@ -19,7 +19,8 @@ services:
     image: ghcr.io/domitorai/ui-guide-agent-server:${UIGUIDE_VERSION:-latest}
     # the name used by the administrator lines: docker exec uiguide dotnet uiguide-server.dll app ...
     container_name: uiguide
-    restart: unless-stopped
+    # starts with Docker; after a crash restarted up to 3 times, then stopped (why: docker logs uiguide)
+    restart: on-failure:3
     ports:
       - "8080:8080"
     volumes:
