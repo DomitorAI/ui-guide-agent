@@ -91,21 +91,28 @@ The server is a .NET tool. It needs the .NET SDK 10 or newer.
    - `EmbeddingModel` is optional but recommended, for example `"bge-m3"`. See [Answer cache](how-it-works.md#answer-cache).
      If your LLM has no embedding model, delete this line or leave it empty (`""`).
      A name your LLM does not know shows `"embeddings": "unavailable"` in the health check.
-5. Save your LLM key. Run this once, then open a **new** terminal window:
+5. Save your LLM key. Run this once:
    ```powershell
    setx Llm__ApiKey "<your key>"
    ```
    If your LLM needs no key (for example, Ollama on your computer), skip this step.
-6. Start the server again, in the new window:
+6. Close the terminal window. Open a **new** one and start the server there:
    ```powershell
    uiguide-server
    ```
+   A window that was already open does not see the key saved with `setx`. Only windows opened after it do.
 
 **Check it**
 
-7. Open `http://localhost:5180/api/v1/health` in your browser. You should see `"llm": "ok"`.
+7. The server's window says whether your LLM answers:
+   - *"The LLM answers: model … at …"*: all good.
+   - *"The LLM cannot be used: …"*: the rest of the line says why and what to do. For example: there is no key, the key is refused, the key cannot use this model (the line then lists the models it can use), or the address is wrong.
+
+   You can also open `http://localhost:5180/api/v1/health` in your browser. You should see `"llm": "ok"`.
    - `"llm": "not_configured"` means `BaseUrl` or `Model` is missing.
-   - `"llm": "unavailable"` means your LLM does not answer. Check the address, the model name, the key and the network.
+   - `"llm": "unavailable"` means the server cannot use your LLM. `"llmProblem"` says why.
+
+   `"llmProblem"` is shown only in a browser on the server's own computer. `uiguide doctor` shows it too.
 8. Rebuild your application. The build finds the server and:
    - writes `"server": "http://localhost:5180"` into `uiguide.json`;
    - registers your application on the server, in `%LOCALAPPDATA%\ui-guide-agent\data\apps\<appId>.json`. See [The application profile](#the-application-profile).
@@ -174,7 +181,7 @@ For each problem it tells you what to do. It ends with exit code 1 when somethin
 | *The assistant is not configured yet.* | There is no server address yet. Do step 2, then rebuild. |
 | *Cannot reach the assistant. Check the connection.* | Check that the server is running and that `server` in `uiguide.json` is correct. |
 | *You are not signed in to the assistant.* | A server on another computer needs authentication. The administrator must run the line printed by `uiguide init`. See [Your company's server](company-server.md). |
-| *The assistant is not available right now.* | The server cannot use your LLM. Check `/api/v1/health` (step 2). |
+| *The assistant is not available right now.* | The server cannot use your LLM. The server's window says why. See step 2, "Check it". |
 | *The assistant is busy. Please try again in N s.* | Your LLM is at its limit. The user can try again after the time shown. |
 | *The assistant is taking too long.* | The LLM did not answer in time. The limit is `Llm:TimeoutSeconds`, 180 seconds by default. |
 | *Something went wrong. Please try again.* | Most often the `appId` is not registered on the server, or its file is not valid JSON. The server log says which. |

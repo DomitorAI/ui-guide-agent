@@ -59,7 +59,7 @@ Use the ready image `ghcr.io/domitorai/ui-guide-agent-server`. There is nothing 
 
 | What | Command |
 |---|---|
-| Why it stopped | `docker compose logs uiguide` |
+| Why it stopped, or why it cannot use your LLM | `docker compose logs uiguide` |
 | Update | `docker compose pull && docker compose up -d` |
 
 After an update, registrations, bundles and cached answers stay on the volume.
@@ -77,7 +77,7 @@ docker run -d --name uiguide --restart on-failure:3 -p 8080:8080 -v uiguide-data
 
 | What | Command |
 |---|---|
-| Why it stopped | `docker logs uiguide` |
+| Why it stopped, or why it cannot use your LLM | `docker logs uiguide` |
 | Start it again | `docker start uiguide` |
 | Update | `docker pull ghcr.io/domitorai/ui-guide-agent-server:latest`, then `docker rm -f uiguide`, then the same `docker run` command |
 
@@ -110,6 +110,8 @@ The .NET 10 SDK must be installed for all users.
    uiguide-server service start
    ```
    It starts the service, opens its port in the firewall and checks that it answers.
+   If the server cannot use your LLM, it says why: no key, a refused key, a model the key cannot use, or a wrong address.
+   `uiguide-server service status` says it too.
 
 The settings, the key and the data can be read only by administrators and by the service.
 

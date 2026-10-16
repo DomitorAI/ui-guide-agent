@@ -161,19 +161,25 @@ You do this once. Nothing in your application changes.
    - `EmbeddingModel` is optional but recommended. See [Answer cache](docs/how-it-works.md#answer-cache).
      If your LLM has no embedding model, delete this line or leave it empty (`""`).
      A name your LLM does not know shows `"embeddings": "unavailable"` in the health check.
-5. Save your LLM key. Run this once, then open a **new** terminal window:
+5. Save your LLM key. Run this once:
    ```powershell
    setx Llm__ApiKey "<your key>"
    ```
    If your LLM needs no key (for example, Ollama on your computer), skip this step.
-6. Start the server again, in the new window:
+6. Close the terminal window. Open a **new** one and start the server there:
    ```powershell
    uiguide-server
    ```
+   A window that was already open does not see the key saved with `setx`. Only windows opened after it do.
 
 **Check it**
 
-7. Open `http://localhost:5180/api/v1/health` in your browser. You should see `"llm": "ok"`.
+7. The server's window says whether your LLM answers:
+   - *"The LLM answers: model … at …"*: all good.
+   - *"The LLM cannot be used: …"*: the rest of the line says why and what to do. For example: there is no key, the key is refused, or the key cannot use this model (the line then lists the models it can use).
+
+   You can also open `http://localhost:5180/api/v1/health` in your browser. You should see `"llm": "ok"`.
+   If not, `"llmProblem"` says why.
 8. Rebuild your application. The build finds the server, writes its address into `uiguide.json` and registers your application on it.
 
 > **Why is the key not in `server.json`?**
