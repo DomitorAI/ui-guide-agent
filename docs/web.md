@@ -2,60 +2,117 @@
 
 # Getting started — web
 
-Three ways, by how your application is built. In all three the first build does everything for the assistant; you add no code.
+There are three ways, depending on how your application is built.
+In all three, the first build does everything for the assistant. You add no code.
 
 ## Blazor, Razor Pages / MVC, .NET MAUI Blazor Hybrid
 
-```powershell
-dotnet add package UiGuideAgent.Web
-```
+1. Add the package:
+   ```powershell
+   dotnet add package UiGuideAgent.Web
+   ```
+2. Add this line to your page, before `</body>`:
+   ```html
+   <script src="_content/UiGuideAgent.Web/ui-guide-agent.js"></script>
+   ```
+   The page is `wwwroot/index.html`, `App.razor` or `_Layout.cshtml`. The line is always the same.
 
-and one line in your page, before `</body>` (`wwwroot/index.html`, `App.razor` or `_Layout.cshtml`) — always the same:
+## React, Vue, Svelte, SvelteKit, Astro, Nuxt, Next.js, Angular…
 
-```html
-<script src="_content/UiGuideAgent.Web/ui-guide-agent.js"></script>
-```
+No .NET needed.
 
-## React, Vue, Svelte, SvelteKit, Astro, Nuxt, Next.js, Angular… (no .NET needed)
+1. Add the package:
+   ```powershell
+   npm install -D @ui-guide-agent/web
+   ```
+2. Add one line to your framework's configuration:
 
-```powershell
-npm install -D @ui-guide-agent/web
-```
-
-and one line in your bundler's configuration:
-
-| Framework / bundler | The line |
+| Framework or bundler | What to add |
 |---|---|
-| **Vite** (React, Vue, Svelte, Solid, Preact…) | `vite.config`: `import uiGuide from '@ui-guide-agent/web/vite'` and `plugins: [uiGuide()]` — the assistant is put in your page by itself |
-| **SvelteKit** | `vite.config`: `plugins: [sveltekit(), uiGuide()]` (`import uiGuide from '@ui-guide-agent/web/vite'`) — the same plugin; every page gets the assistant |
-| **Astro** | `astro.config`: `import uiGuide from '@ui-guide-agent/web/astro'` and `integrations: [uiGuide()]` — every page gets the assistant |
-| **Nuxt** | `nuxt.config`: `modules: ['@ui-guide-agent/web/nuxt']` — every page gets the assistant |
-| **webpack** 5 / Rspack | `import { UiGuidePlugin } from '@ui-guide-agent/web/webpack'` and `plugins: [new UiGuidePlugin()]` — added to every entry by itself |
-| **Next.js** | `next.config.mjs`: `export default withUiGuide(nextConfig)` (`import { withUiGuide } from '@ui-guide-agent/web/next'`), and in `instrumentation-client.ts`: `import '@ui-guide-agent/web/auto';` |
-| **Angular CLI** | its build takes no plugin, so two scripts in `package.json`: `"prestart": "uiguide prepare"` and `"prebuild": "uiguide prepare --release"`, and `import '@ui-guide-agent/web/auto';` once in `src/main.ts` — `npm start` and `npm run build` then do the same as the other frameworks |
+| **Vite** (React, Vue, Svelte, Solid, Preact…) | In `vite.config`: `import uiGuide from '@ui-guide-agent/web/vite'` and `plugins: [uiGuide()]`. The assistant is added to your page by itself. |
+| **SvelteKit** | In `vite.config`: `import uiGuide from '@ui-guide-agent/web/vite'` and `plugins: [sveltekit(), uiGuide()]`. It is the same plugin. Every page gets the assistant. |
+| **Astro** | In `astro.config`: `import uiGuide from '@ui-guide-agent/web/astro'` and `integrations: [uiGuide()]`. Every page gets the assistant. |
+| **Nuxt** | In `nuxt.config`: `modules: ['@ui-guide-agent/web/nuxt']`. Every page gets the assistant. |
+| **webpack 5** or Rspack | `import { UiGuidePlugin } from '@ui-guide-agent/web/webpack'` and `plugins: [new UiGuidePlugin()]`. It is added to every entry by itself. |
+| **Next.js** | In `next.config.mjs`: `import { withUiGuide } from '@ui-guide-agent/web/next'` and `export default withUiGuide(nextConfig)`. In `instrumentation-client.ts`: `import '@ui-guide-agent/web/auto';` |
+| **Angular CLI** | Its build takes no plugin. Add two scripts to `package.json`: `"prestart": "uiguide prepare"` and `"prebuild": "uiguide prepare --release"`. Add `import '@ui-guide-agent/web/auto';` once in `src/main.ts`. Then `npm start` and `npm run build` work like in the other frameworks. |
 
-npm installs the `uiguide` tool of your computer with the package (Windows, Linux, macOS; x64 and Arm64) — no .NET. Options (rarely needed): `uiGuide({ serverRequired: true, publicDir: '…' })`; Nuxt: `modules: [['@ui-guide-agent/web/nuxt', { serverRequired: true }]]` — see [Configuration](configuration.md#build-messages-and-plugin-options).
+npm also installs the `uiguide` tool for your computer, with the package.
+It works on Windows, Linux and macOS, on x64 and Arm64. No .NET needed.
+
+**Options** (rarely needed):
+- `uiGuide({ serverRequired: true, publicDir: '…' })`;
+- Nuxt: `modules: [['@ui-guide-agent/web/nuxt', { serverRequired: true }]]`.
+
+See [Configuration](configuration.md#build-messages-and-plugin-options).
 
 ## A page without a bundler
 
-Copy `ui-guide-agent.js` from the [release](https://github.com/DomitorAI/ui-guide-agent/releases/latest) next to your pages and add `<script src="ui-guide-agent.js"></script>` before `</body>` in each. In the folder of your pages (no `package.json` needed; `dotnet tool install -g UiGuideAgent.Cli` once): `uiguide init` writes `uiguide.config.json` next to them — run it again after changing the server — and `uiguide bundle` the knowledge bundle, again after you change your pages. `uiguide update` replaces `ui-guide-agent.js` with the latest one.
+1. Copy `ui-guide-agent.js` from the [latest release](https://github.com/DomitorAI/ui-guide-agent/releases/latest) next to your pages.
+2. Add this line to each page, before `</body>`:
+   ```html
+   <script src="ui-guide-agent.js"></script>
+   ```
+3. Install the `uiguide` tool once:
+   ```powershell
+   dotnet tool install -g UiGuideAgent.Cli
+   ```
+4. In the folder of your pages, run `uiguide init`. It writes `uiguide.config.json` next to your pages. No `package.json` is needed.
+   Run it again when you change the server.
+5. Run `uiguide bundle`. It writes the knowledge bundle.
+   Run it again when you change your pages.
+
+`uiguide update` replaces `ui-guide-agent.js` with the latest version.
 
 ## What the build does
 
-At every build (and every dev server start):
+At every build, and every time the development server starts, the build:
 
-- **`uiguide.json`** in your project — created by the first build (the application id from the project's name); yours from then on;
-- **`uiguide.config.json`** next to your pages (`wwwroot/` or `public/`) — what the page reads: the same settings, without comments. In the build for your users (`dotnet publish`, `vite build`, `next build`) an address of this computer (`localhost`) is left out;
-- **`uiguide.bundle.json`** next to it — your pages, routes and links for the assistant (see below);
-- the warnings: `UIG001` for every control without a name, `UIG003` while your users have no server address, `UIG004` while the panel is in English for one of your languages.
+- creates **`uiguide.json`** in your project, the first time only. The application id is taken from the project's name. The file is yours from then on.
+- writes **`uiguide.config.json`** next to your pages (in `wwwroot/` or `public/`). This is what the page reads: the same settings, without comments.
+  In the build for your users (`dotnet publish`, `vite build`, `next build`), the address of your computer (`localhost`) is left out.
+- writes **`uiguide.bundle.json`** next to it: your pages, routes and links, for the assistant. See below.
+- shows these warnings:
+  - `UIG001` for every control without a name;
+  - `UIG003` while your users have no server address;
+  - `UIG004` while the panel is in English for one of your languages.
 
-Without a server the page works and the assistant answers *"The assistant is not configured yet."* — nothing is sent anywhere. Then connect one, as in the [Quick start](../README.md#quick-start): the server on your computer is found by the next build (which also registers your application with your development addresses), your company's with `uiguide init --server https://…`.
+**Without a server**, the page works and the assistant answers *"The assistant is not configured yet."* Nothing is sent anywhere.
 
-**The pages allowed to use the server.** A web page can call the server only from an origin listed in your application's registration (`"origins"` in `apps/<appId>.json` on the server): the build registers your development addresses (`launchSettings.json`, the Vite / webpack dev servers, `https://0.0.0.1` for .NET MAUI Blazor Hybrid); add your production origin there (e.g. `"https://shop.example.com"`), or `uiguide init --origins https://shop.example.com`. Never a wildcard — otherwise any website your users open could use your LLM.
+**Then connect a server**, as in the [Quick start](../README.md#quick-start):
+- The server on your computer is found by the next build. The build also registers your application with your development addresses.
+- For your company's server, run `uiguide init --server https://…`.
+
+### Which pages may use the server
+
+A web page can call the server only from an origin listed in your application's registration.
+This is `"origins"` in `apps/<appId>.json` on the server.
+
+- The build registers your development addresses: from `launchSettings.json`, from the Vite and webpack development servers, and `https://0.0.0.1` for .NET MAUI Blazor Hybrid.
+- Add your production address yourself, for example `"https://shop.example.com"`.
+  Or run `uiguide init --origins https://shop.example.com`.
+- Never use a wildcard. Otherwise any website your users open could use your LLM.
 
 ## Name the controls the browser way
 
-`aria-label="Export orders"`, a `<label for="…">` or a `<label>` around the field, the button's text. An icon alone is not a name; a `<div @onclick>` / `<span onClick>` is reported too — it is not a control (use a `<button>`). Read: Razor, HTML, Vue, Svelte, Astro, JSX / TSX (also JSX in `.js` files). The UI map's screens get their `route` from `@page "/…"`, from your router configuration (Vue Router, React Router, Angular routes) or from your folders (Next.js `pages/` and `app/…/page.js|tsx`, Nuxt `pages/`, SvelteKit `src/routes/…/+page.svelte`, Astro `src/pages/…`), so the assistant knows the page the user is on; links and router calls (`href`, `to`, `routerLink`, `navigate('/…')`, `navigateTo('/…')`, `router.push('/…')`, `goto('/…')`, also in the method a click handler calls) become the logic graph.
+A control's name comes from:
+- `aria-label="Export orders"`;
+- a `<label for="…">`, or a `<label>` around the field;
+- the button's text.
+
+An icon alone is not a name.
+A `<div @onclick>` or `<span onClick>` is reported too, because it is not a control. Use a `<button>` instead.
+
+**What the build reads:** Razor, HTML, Vue, Svelte, Astro, JSX and TSX (also JSX in `.js` files).
+
+**How the assistant knows the page the user is on.** Each screen gets its route from:
+- `@page "/…"` in Razor;
+- your router configuration (Vue Router, React Router, Angular routes);
+- your folders: Next.js `pages/` and `app/…/page.js|tsx`, Nuxt `pages/`, SvelteKit `src/routes/…/+page.svelte`, Astro `src/pages/…`.
+
+**How the assistant knows which control opens which page.** The build reads links and router calls:
+`href`, `to`, `routerLink`, `navigate('/…')`, `navigateTo('/…')`, `router.push('/…')`, `goto('/…')`.
+It also finds them in the method a click handler calls.
 
 ## From code (optional)
 
@@ -67,6 +124,20 @@ setToken(() => auth.accessToken);       // for a server where your application u
 setLanguage('de-DE');                   // default: <html lang>, followed when your application changes it
 ```
 
-Also `removeContext`, `clearContext`, `stop`, and `start({ server, appId, … })` to start it yourself (`"autoStart": false` in `uiguide.json`). Blazor: `await JS.InvokeVoidAsync("uiGuide.setContext", "orderOpen", true);`. Look, position and the panel's texts: in `uiguide.json`, the same keys as on the desktop ([Look and texts](desktop.md#look-and-texts)).
+Other functions:
+- `removeContext` and `clearContext`;
+- `stop`;
+- `start({ server, appId, … })`, to start the assistant yourself (with `"autoStart": false` in `uiguide.json`).
 
-What the page sends is filtered like on the desktop: roles, labels and states only — never values, never table or list contents (lists inside navigation, menus and toolbars are kept; `data-uiguide="ui"` keeps another one, `data-uiguide="ignore"` hides a part of the page).
+**Blazor:** `await JS.InvokeVoidAsync("uiGuide.setContext", "orderOpen", true);`
+
+**Look, position and the panel's texts:** in `uiguide.json`, with the same keys as on the desktop. See [Look and texts](desktop.md#look-and-texts).
+
+## What the page sends
+
+What the page sends is filtered as on the desktop: roles, labels and states only.
+Never values, and never the contents of tables or lists.
+
+- Lists inside navigation, menus and toolbars are kept.
+- `data-uiguide="ui"` keeps another list.
+- `data-uiguide="ignore"` hides a part of the page from the assistant.

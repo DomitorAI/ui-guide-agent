@@ -1,19 +1,31 @@
-# UiGuide Agent server for a company network (Docker). Start: docker compose up -d
-# The image: ghcr.io/domitorai/ui-guide-agent-server (docker compose pulls it). Update: docker compose pull, then up -d.
-# Secrets come from the environment / an .env file next to this file (never committed):
+# UiGuide Agent server for a company network (Docker).
+#
+# Start:   docker compose up -d
+# Update:  docker compose pull, then docker compose up -d
+# The image is ghcr.io/domitorai/ui-guide-agent-server. docker compose downloads it.
+#
+# The settings come from a file named .env next to this file. Never commit it: it holds the key.
 #   LLM_BASE_URL=https://llm.example.com/v1
 #   LLM_MODEL=qwen3
-#   LLM_API_KEY=...            (empty for a local Ollama)
-#   LLM_EMBEDDING_MODEL=bge-m3 (recommended: an embedding model on the same endpoint; questions asked in other words
-#                               are answered from the cache too; check: /api/v1/health -> "embeddings": "ok")
-#   UIGUIDE_METRICS_KEY=...    (optional: lets Prometheus read /metrics from the network)
+#   LLM_API_KEY=...
+#       Leave it empty for an LLM without a key, for example a local Ollama.
+#   LLM_EMBEDDING_MODEL=bge-m3
+#       Recommended: an embedding model on the same endpoint.
+#       Questions asked in other words are then answered from the cache too.
+#       Check: /api/v1/health must show "embeddings": "ok".
+#   UIGUIDE_METRICS_KEY=...
+#       Optional: lets Prometheus read /metrics from the network.
 #
-# Applications: data/apps/<appId>.json on the volume, written by one line run here (the developer's uiguide init /
-# key / remove print it):  docker exec uiguide dotnet uiguide-server.dll app set|add-key|remove|list ...
-# From the network an application needs authentication:
-#   "auth": "AppKey"   + "keys": ["sha256:..."]   (uiguide init / uiguide key), with "limits";
-#   "auth": "External" + "validation": { "url": "https://your-app/api/me" }   (the user's token is checked there).
-# "auth": "None" answers only requests made inside the container (never from the network).
+# Applications are registered in data/apps/<appId>.json, on the volume.
+# The developer's uiguide init, uiguide key and uiguide remove print one line for you to run here:
+#   docker exec uiguide dotnet uiguide-server.dll app set|add-key|remove|list ...
+#
+# From the network, every application needs authentication:
+#   "auth": "AppKey" with "keys": ["sha256:..."] and "limits"
+#       Set up by uiguide init and uiguide key.
+#   "auth": "External" with "validation": { "url": "https://your-app/api/me" }
+#       The user's token is checked at that address.
+# "auth": "None" answers only requests made inside the container, never from the network.
 name: uiguide
 services:
   uiguide:
