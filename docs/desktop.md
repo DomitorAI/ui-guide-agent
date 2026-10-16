@@ -235,14 +235,21 @@ A generated name that does not match what the button really does would send user
 
 An id (`x:Name` in WPF, `Name` in WinForms) also helps the assistant tell controls apart.
 
-You can see the same list in the console:
+**Use the texts you already wrote.**
+Many controls without a name already have a tooltip, a hint or an inner text.
+Their warning ends with the command that copies those texts into the names, for example:
 
 ```powershell
-uiguide scan          # the list and the percentage of named controls; exit code 1 while any is left (useful in CI)
-uiguide scan --fix    # copies the tooltip, hint or inner text YOU already wrote into the name
+dotnet build "C:\Projects\Shop\Shop.csproj" -p:UiGuideFix=true
 ```
 
-After `--fix`, check that each name says what the control does.
+- Run it in any terminal: the Visual Studio terminal, PowerShell, cmd, the terminal of VS Code or Rider.
+- It works from any folder, because it contains the full path of your project.
+- You install nothing: it uses the UiGuide package of your project.
+
+The command changes your `.xaml` and `.cs` files, then builds.
+The controls with nothing to copy stay in the warnings: name them by hand.
+After it, check in your version control that each name says what the control does.
 
 To make the warnings build errors, add `<WarningsAsErrors>UIG001</WarningsAsErrors>` to the `.csproj`.
 To hide them, add `<NoWarn>UIG001</NoWarn>`.

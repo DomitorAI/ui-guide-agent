@@ -103,6 +103,8 @@ A control's name comes from:
 An icon alone is not a name.
 A `<div @onclick>` or `<span onClick>` is reported too, because it is not a control. Use a `<button>` instead.
 
+A `title` or a `placeholder` already counts as a name, so a control with one is not reported.
+
 **What the build reads:** Razor, HTML, Vue, Svelte, Astro, JSX and TSX (also JSX in `.js` files).
 
 **How the assistant knows the page the user is on.** Each screen gets its route from:

@@ -37,7 +37,7 @@ For example Python, Java or any exe used with the [Companion](companion.md).
 
 | Command | What it does |
 |---|---|
-| `uiguide scan [--fix]` | Lists the controls without a name, with file, line and the percentage of named controls. It reads XAML, WinForms designer files, C# code, Razor, HTML, Vue, Svelte, JSX, Python Qt and Tk. `--fix` only copies your own tooltip or hint text into the name. |
+| `uiguide scan [--fix]` | Lists the controls without a name, with file, line and the percentage of named controls. It reads XAML, WinForms designer files, C# code, Razor, HTML, Vue, Svelte, JSX, Python Qt and Tk. `--fix` only copies your own tooltip or hint text into the name. (A .NET project does not need the tool for this: its build warnings give the command to run, with nothing to install.) |
 | `uiguide bundle` | Generates `uiguide.bundle.json` from the code and `uiguide.map.json`, including which control opens which screen. |
 
 **Angular CLI** has no build plugin.

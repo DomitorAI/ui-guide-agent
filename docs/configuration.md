@@ -63,7 +63,8 @@ The build's messages are ordinary build warnings:
 
 **.NET:**
 - `<WarningsAsErrors>UIG001;UIG003</WarningsAsErrors>` in the project makes them errors;
-- `<NoWarn>UIG001</NoWarn>` hides them.
+- `<NoWarn>UIG001</NoWarn>` hides them;
+- `dotnet build -p:UiGuideFix=true` first copies your own tooltips, hints and inner texts into the names of the controls that have none (it changes your files).
 
 **npm:** the plugin options (`uiGuide({ … })`):
 
