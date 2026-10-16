@@ -249,7 +249,8 @@ The panel's own texts (title, buttons, messages) are built in for English.
 For the other languages of your application, the build asks your server's LLM to translate them once.
 The translations are written under `"texts"` in `uiguide.json`. You can correct them there. They are never overwritten.
 Until a language is translated, its panel is in English and the build shows the warning `UIG004`.
-The answers are always in the language of the question.
+The panel follows the language your UI shows, also when the user picks another language in your application.
+The answers are always in the language of the question, with the button names exactly as the user sees them.
 
 ## Documentation
 

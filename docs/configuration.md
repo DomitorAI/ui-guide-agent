@@ -24,7 +24,7 @@ The knowledge bundle is always `uiguide.bundle.json`, next to it.
 |---|---|---|
 | `server` | — | The UiGuide Agent server, for example `https://uiguide.example.com`. The build writes it when a server answers on your computer. You can also write it yourself. If it is missing, the application works and the assistant says it is not configured yet. |
 | `appId` | the project's name | The application id registered on the server. Lowercase letters, digits and `-` only. |
-| `language` | the application's UI culture (web: `<html lang>`) | The assistant's language, for example `de-DE`. For an application in one language without resource files, it is also the language the panel's texts are translated into. |
+| `language` | the language your UI shows | The assistant's language, fixed, for example `de-DE`. Leave it out and the assistant follows the language your UI shows, also when the user picks another language in your application. For an application in one language without resource files, set it: it is also the language the panel's texts are translated into. |
 | `autoStart` | `true` | `false` means the assistant starts only from code (`UiGuide.Attach` or `uiGuide.start`). |
 | `key` | — | The application key, for a server where the application uses `"auth": "AppKey"`. Written by `uiguide init --server` and `uiguide key`. |
 | `position` | `bottom-right` | Or `bottom-left`. |

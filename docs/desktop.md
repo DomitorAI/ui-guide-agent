@@ -399,7 +399,7 @@ UiGuide.MapScreen(nameof(ReportWindow), "report");
 |---|---|
 | `UiGuide.Attach(window)` or `UiGuide.Attach(form)` | Shows the assistant on a WPF window or a WinForms form. It replaces a previous one. You can pass `UiGuideOptions` instead of using `uiguide.json`. |
 | `UiGuide.Detach()` | Removes the button and the panel. |
-| `UiGuide.SetLanguage("de-DE")` | Changes the assistant's language, for example when your UI language changes. |
+| `UiGuide.SetLanguage("de-DE")` | Fixes the assistant's language. You rarely need it: by default the assistant follows the language your UI shows. |
 | `UiGuide.IsAttached` | Whether the assistant is shown on an open window. |
 | `UiGuide.SetToken(() => session.AccessToken)` | Gives the signed-in user's token, for a server where your application uses `"auth": "External"`. |
 | `"autoStart": false` in `uiguide.json` | No automatic start. Use `UiGuide.Attach` instead. |
@@ -433,6 +433,16 @@ These are the languages of your resource files. For an application in one langua
 The translations are written under `"texts"`. They are yours from then on, to check and change.
 Texts you already wrote are never replaced.
 If the server cannot translate them, the build shows the warning `UIG004`. The panel stays in English for those languages, and the next build asks again.
+
+**Which language the assistant uses.**
+The assistant follows the language your UI shows right now.
+It works however your application switches languages (resource dictionaries, `.resx` files, a language setting) and whatever culture it sets for numbers and dates.
+- The panel's texts are in that language.
+- Buttons and menus are named exactly as the user sees them, in that language.
+- The answer itself is in the language of the question. A user who asks in Romanian while the UI is in Russian gets a Romanian answer with the Russian button names.
+
+When the user picks another language in your application, the assistant follows it at the next question.
+To fix the language instead, set `"language"` in `uiguide.json` or call `UiGuide.SetLanguage`.
 
 **Texts you can change:**
 - `open`: the round button's name;

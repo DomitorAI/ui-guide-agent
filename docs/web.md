@@ -121,7 +121,7 @@ import { setContext, setToken, setLanguage } from '@ui-guide-agent/web';   // th
 
 setContext('orderOpen', true);          // state, never data
 setToken(() => auth.accessToken);       // for a server where your application uses "auth": "External"
-setLanguage('de-DE');                   // default: <html lang>, followed when your application changes it
+setLanguage('de-DE');                   // fixes it; default: the language the page shows, followed when it changes
 ```
 
 Other functions:
