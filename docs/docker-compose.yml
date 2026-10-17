@@ -1,0 +1,53 @@
+# UiGuide Agent server for a company network (Docker).
+#
+# Start:   docker compose up -d
+# Update:  docker compose pull, then docker compose up -d
+# The image is ghcr.io/domitorai/ui-guide-agent-server. docker compose downloads it.
+#
+# The settings come from a file named .env next to this file. Never commit it: it holds the key.
+#   LLM_BASE_URL=https://llm.example.com/v1
+#   LLM_MODEL=qwen3
+#   LLM_API_KEY=...
+#       Leave it empty for an LLM without a key, for example a local Ollama.
+#   LLM_EMBEDDING_MODEL=bge-m3
+#       Recommended: an embedding model on the same endpoint.
+#       Questions asked in other words are then answered from the cache too.
+#       Check: /api/v1/health must show "embeddings": "ok".
+#   UIGUIDE_METRICS_KEY=...
+#       Optional: lets Prometheus read /metrics from the network.
+#
+# Applications are registered in data/apps/<appId>.json, on the volume.
+# The developer's uiguide init, uiguide key and uiguide remove print one line for you to run here:
+#   docker exec uiguide dotnet uiguide-server.dll app set|add-key|remove|list ...
+#
+# From the network, every application needs authentication:
+#   "auth": "AppKey" with "keys": ["sha256:..."] and "limits"
+#       Set up by uiguide init and uiguide key.
+#   "auth": "External" with "validation": { "url": "https://your-app/api/me" }
+#       The user's token is checked at that address.
+# "auth": "None" answers only requests made inside the container, never from the network.
+name: uiguide
+services:
+  uiguide:
+    image: ghcr.io/domitorai/ui-guide-agent-server:${UIGUIDE_VERSION:-latest}
+    # the name used by the administrator lines: docker exec uiguide dotnet uiguide-server.dll app ...
+    container_name: uiguide
+    # starts with Docker; after a crash restarted up to 3 times, then stopped (why: docker logs uiguide)
+    restart: on-failure:3
+    ports:
+      - "8080:8080"
+    volumes:
+      - uiguide-data:/data
+    environment:
+      Llm__BaseUrl: ${LLM_BASE_URL:?set LLM_BASE_URL}
+      Llm__Model: ${LLM_MODEL:?set LLM_MODEL}
+      Llm__ApiKey: ${LLM_API_KEY:-}
+      Llm__EmbeddingModel: ${LLM_EMBEDDING_MODEL:-}
+      UiGuide__MetricsKey: ${UIGUIDE_METRICS_KEY:-}
+      # behind a reverse proxy: its IP address(es), so the per-user limits see the real client address
+      UiGuide__TrustedProxies: ${UIGUIDE_TRUSTED_PROXIES:-}
+
+volumes:
+  # the same volume as the docker run line in the documentation, whatever the folder of this file
+  uiguide-data:
+    name: uiguide-data
