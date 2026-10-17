@@ -1,10 +1,6 @@
 # UiGuide Agent
 
-> **🚧 Under active development — not ready for use yet.**
-> UiGuide Agent is in early development. Parts of what is described here may change or may not work yet.
-> Please wait for the first stable release before you add it to your project.
-> To be notified, click **Watch → Custom → Releases** on this page.
-> Ideas and questions are welcome in [Discussions](https://github.com/DomitorAI/ui-guide-agent/discussions).
+> Ideas, questions and bug reports are welcome in [Discussions](https://github.com/DomitorAI/ui-guide-agent/discussions).
 
 ## YOUR USERS ASK. YOUR APP ANSWERS. NO DOCUMENTATION TO WRITE.
 
